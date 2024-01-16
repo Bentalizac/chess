@@ -55,5 +55,9 @@ public class ChessPosition {
     }
     public void setPiece(ChessPiece piece) {this.occupied = true;this.piece = piece;} /** TODO make sure the occupied value is set to false when a piece moves off*/
     public ChessPiece getPiece() {return this.piece;}
+
+    public boolean isEdge() {
+        return this.row + 1 >= 8 | this.row - 1 <= 0 | this.col + 1 >= 8 | this.col - 1 <= 0;
+    }
 }
 
