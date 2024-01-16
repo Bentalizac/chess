@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -7,23 +9,51 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
-
-    public ChessPosition(int row, int col) {
+    private ChessPiece piece;
+    public boolean occupied = false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPosition that = (ChessPosition) o;
+        return occupied == that.occupied && row == that.row && col == that.col && Objects.equals(piece, that.piece);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(piece, occupied, row, col);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition{" +
+                "piece=" + piece +
+                ", occupied=" + occupied +
+                ", row=" + row +
+                ", col=" + col +
+                '}';
+    }
+
+    private final int row;
+    private final int col;
+    public ChessPosition(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */
-    public int getRow() {
-        throw new RuntimeException("Not implemented");
+    public int getRow() { return this.row;
     }
-
     /**
      * @return which column this position is in
      * 1 codes for the left row
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return this.col;
     }
+    public void setPiece(ChessPiece piece) {this.occupied = true;this.piece = piece;} /** TODO make sure the occupied value is set to false when a piece moves off*/
+    public ChessPiece getPiece() {return this.piece;}
 }
+

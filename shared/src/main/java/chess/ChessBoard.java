@@ -8,10 +8,21 @@ package chess;
  */
 public class ChessBoard {
 
+    private ChessPosition[][] spaces;
     public ChessBoard() {
-        
-    }
+        this.spaces = new ChessPosition[9][9];
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
+                this.spaces[i][j] = new ChessPosition(i, j);
+            }
+        }
+        ChessPiece test = new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.KING);
+        //this.spaces[1][1].setPiece(test);
 
+        this.addPiece(this.spaces[1][1], test);
+
+        System.out.println(this.spaces[1][1]);
+    }
     /**
      * Adds a chess piece to the chessboard
      *
@@ -19,7 +30,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        this.spaces[position.getRow()][position.getColumn()].setPiece(piece);
     }
 
     /**
@@ -30,7 +41,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return this.spaces[position.getRow()][position.getColumn()].getPiece();
     }
 
     /**
