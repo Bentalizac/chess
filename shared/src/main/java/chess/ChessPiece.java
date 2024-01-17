@@ -128,8 +128,6 @@ public class ChessPiece {
         }
         x = myPosition.getRow(); y = myPosition.getColumn();
 
-
-
         // down/left
         while(x >= 1 && y >= 1) {
             ChessPosition target = board.spaces[x][y];
