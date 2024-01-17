@@ -16,7 +16,7 @@ public class ChessPosition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPosition that = (ChessPosition) o;
-        return occupied == that.occupied && row == that.row && col == that.col && Objects.equals(piece, that.piece);
+        return row == that.row && col == that.col && Objects.equals(piece, that.piece);
     }
 
     @Override
@@ -24,15 +24,7 @@ public class ChessPosition {
         return Objects.hash(piece, occupied, row, col);
     }
 
-    @Override
-    public String toString() {
-        return "ChessPosition{" +
-                "piece=" + piece +
-                ", occupied=" + occupied +
-                ", row=" + row +
-                ", col=" + col +
-                '}';
-    }
+
 
     private final int row;
     private final int col;
@@ -58,6 +50,11 @@ public class ChessPosition {
 
     public boolean isEdge() {
         return this.row + 1 >= 8 | this.row - 1 <= 0 | this.col + 1 >= 8 | this.col - 1 <= 0;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + this.row + "/" + this.col +']';
     }
 }
 

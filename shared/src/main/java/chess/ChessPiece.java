@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -10,9 +11,11 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessPiece.PieceType type;
+    private PieceType type;
     private ChessGame.TeamColor pieceColor;
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+
+    private Collection<ChessPosition> threats;
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
         this .pieceColor = pieceColor;
     }
@@ -51,9 +54,146 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = this;
+        ChessPosition start = myPosition;
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        System.out.println(board);
+        switch (piece.type) {
+            case KING:
+                break;
+            case PAWN:
+                break;
+            case ROOK:
+                break;
+            case QUEEN:
+                break;
+            case BISHOP:
+                //Up/Right Diagonal
+                int x = start.getRow();
+                int y = start.getColumn();
+                validMoves.addAll(diagonalMovement(board, myPosition));
+                System.out.println(validMoves);
+                break;
+            case KNIGHT:
+                break;
+            case null:
+                return null;
+        }
+    return validMoves;
     }
 
+    private Collection<ChessMove> diagonalMovement(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        int x = myPosition.getRow();
+        int y = myPosition.getColumn();
+        // Up/right
+        while(x <= 8 && y <= 8) {
+            ChessPosition target = board.spaces[x][y];
+            x++; y++;
+            System.out.println(target);
+            if (!isEnemy(this.pieceColor, target)) {break;}
+            if (isValid(target)){
+                ChessMove newMove = new ChessMove(myPosition, target);
+                validMoves.add(newMove);
+                if (target.occupied) {break;}
+            }
+        }
+        x = myPosition.getRow(); y = myPosition.getColumn();
+
+        // down/right
+        while(x <= 8 && y >= 1) {
+            ChessPosition target = board.spaces[x][y];
+            x++; y--;
+            System.out.println(target);
+            if (!isEnemy(this.pieceColor, target)) {break;}
+            if (isValid(target)){
+                ChessMove newMove = new ChessMove(myPosition, target);
+                validMoves.add(newMove);
+                if (target.occupied) {break;}
+            }
+        }
+        x = myPosition.getRow(); y = myPosition.getColumn();
+
+        // Up/left
+        while(x >= 1 && y <= 8) {
+            ChessPosition target = board.spaces[x][y];
+            x--; y++;
+            System.out.println(target);
+            if (!isEnemy(this.pieceColor, target)) {break;}
+            if (isValid(target)){
+                ChessMove newMove = new ChessMove(myPosition, target);
+                validMoves.add(newMove);
+                if (target.occupied) {break;}
+            }
+        }
+        x = myPosition.getRow(); y = myPosition.getColumn();
+
+
+
+        // down/left
+        while(x >= 1 && y >= 1) {
+            ChessPosition target = board.spaces[x][y];
+            x--; y--;
+            System.out.println(target);
+            if (!isEnemy(this.pieceColor, target)) {break;}
+            if (isValid(target)){
+                ChessMove newMove = new ChessMove(myPosition, target);
+                validMoves.add(newMove);
+                if (target.occupied) {break;}
+            }
+        }
+        x = myPosition.getRow(); y = myPosition.getColumn();
+
+        System.out.println(validMoves);
+
+
+        /**
+         // Down/left
+        System.out.println("Checking down/left");
+        x = myPosition.getRow();
+        y = myPosition.getColumn();
+        while(!board.spaces[y-1][x-1].isEdge()){ // Doesn't account for capturing the first enemy piece blocking the path
+            System.out.println("Space at " + x + "/" + y + " is a potential move" );
+            if (board.spaces[y-1][x-1].occupied) {
+                if (isEnemy(myPosition.getPiece().getTeamColor(), board.spaces[y-1][x-1])){
+                    validMoves.add(new ChessMove(myPosition, board.spaces[y-1][x-1], myPosition.getPiece().getPieceType()));
+                    break; // This should terminate after marking a capture-able tile as valid
+                }}
+            else{
+                validMoves.add(new ChessMove(myPosition, board.spaces[y+1][x+1], this.getPieceType()));
+            }
+            x--;
+            y--;}
+        Old version of loop, kept for records
+         * while(!board.spaces[y+1][x-1].isEdge() | !board.spaces[x+1][y+1].occupied){
+         System.out.println("Space at " + x + "/" + y + " is a valid move" );
+         }*/
+        return validMoves;
+
+
+
+    }
+
+    private boolean isValid(ChessPosition target) {
+        if (!target.occupied){
+            return true;
+        }
+        else return isEnemy(this.getTeamColor(), target);
+    }
+
+    private boolean isEnemy(ChessGame.TeamColor ally, ChessPosition target) { // Checks if a piece at a position is an enemy
+        return target.getPiece().getTeamColor() != ally;
+    }
+
+    private Collection<ChessPosition> getThreats(Collection<ChessMove> validMoves) {
+        Collection<ChessPosition> threatenedTiles = new HashSet<>();
+        for (ChessMove tile : validMoves){
+            if (tile.getEndPosition().occupied && isEnemy(this.pieceColor,tile.getEndPosition())){
+                threatenedTiles.add(tile.getEndPosition());
+            }
+        }
+        return threatenedTiles;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
