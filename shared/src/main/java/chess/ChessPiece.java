@@ -82,16 +82,20 @@ public class ChessPiece {
     return validMoves;
     }
 
+
     private Collection<ChessMove> diagonalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         int x = myPosition.getRow();
         int y = myPosition.getColumn();
+
         // Up/right
         while(x <= 8 && y <= 8) {
             ChessPosition target = board.spaces[x][y];
             x++; y++;
             System.out.println(target);
-            if (!isEnemy(this.pieceColor, target)) {break;}
+
+            //if (!isEnemy(this.pieceColor, target)) {break;}
+
             if (isValid(target)){
                 ChessMove newMove = new ChessMove(myPosition, target);
                 validMoves.add(newMove);
@@ -105,12 +109,13 @@ public class ChessPiece {
             ChessPosition target = board.spaces[x][y];
             x++; y--;
             System.out.println(target);
-            if (!isEnemy(this.pieceColor, target)) {break;}
+            //if (!isEnemy(this.pieceColor, target)) {break;} this line is seeing the current piece and marking itself as an invalid move, but never moves on
             if (isValid(target)){
                 ChessMove newMove = new ChessMove(myPosition, target);
                 validMoves.add(newMove);
                 if (target.occupied) {break;}
             }
+
         }
         x = myPosition.getRow(); y = myPosition.getColumn();
 
@@ -119,7 +124,7 @@ public class ChessPiece {
             ChessPosition target = board.spaces[x][y];
             x--; y++;
             System.out.println(target);
-            if (!isEnemy(this.pieceColor, target)) {break;}
+            //if (!isEnemy(this.pieceColor, target)) {break;}
             if (isValid(target)){
                 ChessMove newMove = new ChessMove(myPosition, target);
                 validMoves.add(newMove);
@@ -133,7 +138,8 @@ public class ChessPiece {
             ChessPosition target = board.spaces[x][y];
             x--; y--;
             System.out.println(target);
-            if (!isEnemy(this.pieceColor, target)) {break;}
+            //if (!isEnemy(this.pieceColor, target)) {break;}
+
             if (isValid(target)){
                 ChessMove newMove = new ChessMove(myPosition, target);
                 validMoves.add(newMove);
@@ -177,6 +183,29 @@ public class ChessPiece {
             return true;
         }
         else return isEnemy(this.getTeamColor(), target);
+    }
+
+    private Collection<ChessMove> modularDiagonal(ChessPosition myPosition, ChessBoard board,int xModifier, int yModifier) {
+        int x = myPosition.getColumn();
+        int y = myPosition.getRow();
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        while (x+xModifier > 8 && x+xModifier <=0 && y + yModifier > 8 && y + yModifier <=0) {
+            x = x + xModifier;
+            y = y + yModifier;
+            ChessPosition target = board.spaces[x][y];
+
+            if (isValid((target))) {
+                ChessMove newMove = new ChessMove(myPosition, target);
+                validMoves.add(newMove);
+            }
+
+        }
+
+
+
+
+        return validMoves;
     }
 
     private boolean isEnemy(ChessGame.TeamColor ally, ChessPosition target) { // Checks if a piece at a position is an enemy
