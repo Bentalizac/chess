@@ -68,9 +68,6 @@ public class ChessPiece {
             case QUEEN:
                 break;
             case BISHOP:
-                //Up/Right Diagonal
-                int x = start.getRow();
-                int y = start.getColumn();
                 validMoves.addAll(diagonalMovement(board, myPosition));
                 System.out.println(validMoves);
                 break;
@@ -85,71 +82,14 @@ public class ChessPiece {
 
     private Collection<ChessMove> diagonalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
-        int x = myPosition.getRow();
-        int y = myPosition.getColumn();
-
         // Up/right
-        while(x <= 8 && y <= 8) {
-            ChessPosition target = board.spaces[x][y];
-            x++; y++;
-            System.out.println(target);
-
-            //if (!isEnemy(this.pieceColor, target)) {break;}
-
-            if (isValid(target)){
-                ChessMove newMove = new ChessMove(myPosition, target);
-                validMoves.add(newMove);
-                if (target.occupied) {break;}
-            }
-        }
-        x = myPosition.getRow(); y = myPosition.getColumn();
-
+        validMoves.addAll(modularDiagonal(myPosition, board, 1, 1));
         // down/right
-        while(x <= 8 && y >= 1) {
-            ChessPosition target = board.spaces[x][y];
-            x++; y--;
-            System.out.println(target);
-            //if (!isEnemy(this.pieceColor, target)) {break;} this line is seeing the current piece and marking itself as an invalid move, but never moves on
-            if (isValid(target)){
-                ChessMove newMove = new ChessMove(myPosition, target);
-                validMoves.add(newMove);
-                if (target.occupied) {break;}
-            }
-
-        }
-        x = myPosition.getRow(); y = myPosition.getColumn();
-
+        validMoves.addAll(modularDiagonal(myPosition, board, 1, -1));
         // Up/left
-        while(x >= 1 && y <= 8) {
-            ChessPosition target = board.spaces[x][y];
-            x--; y++;
-            System.out.println(target);
-            //if (!isEnemy(this.pieceColor, target)) {break;}
-            if (isValid(target)){
-                ChessMove newMove = new ChessMove(myPosition, target);
-                validMoves.add(newMove);
-                if (target.occupied) {break;}
-            }
-        }
-        x = myPosition.getRow(); y = myPosition.getColumn();
-
+        validMoves.addAll(modularDiagonal(myPosition, board, -1, 1));
         // down/left
-        while(x >= 1 && y >= 1) {
-            ChessPosition target = board.spaces[x][y];
-            x--; y--;
-            System.out.println(target);
-            //if (!isEnemy(this.pieceColor, target)) {break;}
-
-            if (isValid(target)){
-                ChessMove newMove = new ChessMove(myPosition, target);
-                validMoves.add(newMove);
-                if (target.occupied) {break;}
-            }
-        }
-        x = myPosition.getRow(); y = myPosition.getColumn();
-
-        System.out.println(validMoves);
-
+        validMoves.addAll(modularDiagonal(myPosition, board, -1, -1));
 
         /**
          // Down/left
@@ -182,7 +122,7 @@ public class ChessPiece {
         if (!target.occupied){
             return true;
         }
-        else return isEnemy(this.getTeamColor(), target);
+        else return isEnemy(target);
     }
 
     private Collection<ChessMove> modularDiagonal(ChessPosition myPosition, ChessBoard board,int xModifier, int yModifier) {
@@ -190,32 +130,33 @@ public class ChessPiece {
         int y = myPosition.getRow();
         HashSet<ChessMove> validMoves = new HashSet<>();
 
-        while (x+xModifier > 8 && x+xModifier <=0 && y + yModifier > 8 && y + yModifier <=0) {
+        while (x+xModifier <= 8 && x+xModifier > 0 && y + yModifier <= 8 && y + yModifier >0) {
             x = x + xModifier;
             y = y + yModifier;
             ChessPosition target = board.spaces[x][y];
+            ChessMove newMove = new ChessMove(myPosition, target);
 
-            if (isValid((target))) {
-                ChessMove newMove = new ChessMove(myPosition, target);
+            if (!target.occupied) {
                 validMoves.add(newMove);
             }
-
+            else {
+                if (isEnemy((target))){
+                    validMoves.add(newMove);
+                }
+                break;
+            }
         }
-
-
-
-
         return validMoves;
     }
 
-    private boolean isEnemy(ChessGame.TeamColor ally, ChessPosition target) { // Checks if a piece at a position is an enemy
-        return target.getPiece().getTeamColor() != ally;
+    private boolean isEnemy(ChessPosition target) { // Checks if a piece at a position is an enemy
+        return target.getPiece().getTeamColor() != this.getTeamColor();
     }
 
     private Collection<ChessPosition> getThreats(Collection<ChessMove> validMoves) {
         Collection<ChessPosition> threatenedTiles = new HashSet<>();
         for (ChessMove tile : validMoves){
-            if (tile.getEndPosition().occupied && isEnemy(this.pieceColor,tile.getEndPosition())){
+            if (tile.getEndPosition().occupied && isEnemy(tile.getEndPosition())){
                 threatenedTiles.add(tile.getEndPosition());
             }
         }
