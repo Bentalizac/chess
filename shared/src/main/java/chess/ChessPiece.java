@@ -85,7 +85,7 @@ public class ChessPiece {
         // Up/right
         validMoves.addAll(modularDiagonal(myPosition, board, 1, 1));
         // down/right
-        validMoves.addAll(modularDiagonal(myPosition, board, 1, -1));
+        validMoves.addAll(modularDiagonal(myPosition, board, 1, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
         // Up/left
         validMoves.addAll(modularDiagonal(myPosition, board, -1, 1));
         // down/left
@@ -133,7 +133,7 @@ public class ChessPiece {
         while (x+xModifier <= 8 && x+xModifier > 0 && y + yModifier <= 8 && y + yModifier >0) {
             x = x + xModifier;
             y = y + yModifier;
-            ChessPosition target = board.spaces[x][y];
+            ChessPosition target = board.spaces[y][x];
             ChessMove newMove = new ChessMove(myPosition, target);
 
             if (!target.occupied) {

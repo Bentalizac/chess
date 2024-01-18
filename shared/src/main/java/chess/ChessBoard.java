@@ -15,7 +15,7 @@ public class ChessBoard {
         this.spaces = new ChessPosition[9][9];
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++) {
-                this.spaces[i][j] = new ChessPosition(j, i);
+                this.spaces[i][j] = new ChessPosition(i, j);
             }
         }
     }
