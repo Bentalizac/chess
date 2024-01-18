@@ -1,5 +1,6 @@
 package chess;
 
+import java.text.CollationElementIterator;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -64,12 +65,14 @@ public class ChessPiece {
             case PAWN:
                 break;
             case ROOK:
+                validMoves.addAll(cardinalMovement(board, myPosition));
                 break;
             case QUEEN:
+                validMoves.addAll(cardinalMovement(board, myPosition));
+                validMoves.addAll(diagonalMovement(board, myPosition));
                 break;
             case BISHOP:
                 validMoves.addAll(diagonalMovement(board, myPosition));
-                System.out.println(validMoves);
                 break;
             case KNIGHT:
                 break;
@@ -90,32 +93,20 @@ public class ChessPiece {
         validMoves.addAll(modularDiagonal(myPosition, board, -1, 1));
         // down/left
         validMoves.addAll(modularDiagonal(myPosition, board, -1, -1));
-
-        /**
-         // Down/left
-        System.out.println("Checking down/left");
-        x = myPosition.getRow();
-        y = myPosition.getColumn();
-        while(!board.spaces[y-1][x-1].isEdge()){ // Doesn't account for capturing the first enemy piece blocking the path
-            System.out.println("Space at " + x + "/" + y + " is a potential move" );
-            if (board.spaces[y-1][x-1].occupied) {
-                if (isEnemy(myPosition.getPiece().getTeamColor(), board.spaces[y-1][x-1])){
-                    validMoves.add(new ChessMove(myPosition, board.spaces[y-1][x-1], myPosition.getPiece().getPieceType()));
-                    break; // This should terminate after marking a capture-able tile as valid
-                }}
-            else{
-                validMoves.add(new ChessMove(myPosition, board.spaces[y+1][x+1], this.getPieceType()));
-            }
-            x--;
-            y--;}
-        Old version of loop, kept for records
-         * while(!board.spaces[y+1][x-1].isEdge() | !board.spaces[x+1][y+1].occupied){
-         System.out.println("Space at " + x + "/" + y + " is a valid move" );
-         }*/
         return validMoves;
+    }
 
-
-
+    private Collection<ChessMove> cardinalMovement(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        // Up
+        validMoves.addAll(modularDiagonal(myPosition, board, 0, 1));
+        // down
+        validMoves.addAll(modularDiagonal(myPosition, board, 0, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
+        // left
+        validMoves.addAll(modularDiagonal(myPosition, board, -1, 0));
+        // right
+        validMoves.addAll(modularDiagonal(myPosition, board, 1, 0));
+        return validMoves;
     }
 
     private boolean isValid(ChessPosition target) {
@@ -129,13 +120,11 @@ public class ChessPiece {
         int x = myPosition.getColumn();
         int y = myPosition.getRow();
         HashSet<ChessMove> validMoves = new HashSet<>();
-
         while (x+xModifier <= 8 && x+xModifier > 0 && y + yModifier <= 8 && y + yModifier >0) {
             x = x + xModifier;
             y = y + yModifier;
             ChessPosition target = board.spaces[y][x];
             ChessMove newMove = new ChessMove(myPosition, target);
-
             if (!target.occupied) {
                 validMoves.add(newMove);
             }

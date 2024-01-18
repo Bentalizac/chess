@@ -11,18 +11,7 @@ import java.util.Objects;
 public class ChessPosition {
     private ChessPiece piece;
     public boolean occupied = false;
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPosition that = (ChessPosition) o;
-        return row == that.row && col == that.col && Objects.equals(piece, that.piece);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(piece, occupied, row, col);
-    }
 
 
 
@@ -55,6 +44,20 @@ public class ChessPosition {
     @Override
     public String toString() {
         return "[" + this.row + "/" + this.col +']';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPosition that = (ChessPosition) o;
+        return occupied == that.occupied && row == that.row && col == that.col && Objects.equals(piece, that.piece);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(piece, occupied, row, col);
     }
 }
 

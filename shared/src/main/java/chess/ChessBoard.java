@@ -54,4 +54,17 @@ public class ChessBoard {
                 "spaces=" + Arrays.toString(spaces) +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.equals(spaces, that.spaces);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(spaces);
+    }
 }
