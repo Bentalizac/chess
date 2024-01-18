@@ -74,10 +74,12 @@ public class ChessPiece {
                 validMoves.addAll(diagonalMovement(board, myPosition));
                 break;
             case KNIGHT:
+                validMoves.addAll(knightMovement(board, myPosition));
                 break;
             case null:
                 return null;
         }
+        validMoves.remove(null);
     return validMoves;
     }
 
@@ -110,7 +112,30 @@ public class ChessPiece {
 
     private Collection<ChessMove> knightMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
+        validMoves.add(moveTo(board, myPosition, 2, 1));
+        validMoves.add(moveTo(board, myPosition, 2, -1));
+        validMoves.add(moveTo(board, myPosition, -2, 1));
+        validMoves.add(moveTo(board, myPosition, -2, -1));
+        validMoves.add(moveTo(board, myPosition, 1, 2));
+        validMoves.add(moveTo(board, myPosition, -1, 2));
+        validMoves.add(moveTo(board, myPosition, 1, -2));
+        validMoves.add(moveTo(board, myPosition, -1, -2));
         return validMoves;
+    }
+
+    private ChessMove moveTo(ChessBoard board, ChessPosition myPosition, int yMod, int xMod) {
+        int y = myPosition.getRow() + yMod;
+        int x = myPosition.getColumn() + xMod;
+        if (validCoords(y, x)) {
+            if (isValid(board.spaces[y][x])) {
+                return new ChessMove(myPosition, board.spaces[y][x]);
+            }
+        }
+        return null;
+    }
+
+    private Boolean validCoords(int y, int x){
+        return x <= 8 && x>0 && y <=8 && y> 0;
     }
 
     private boolean isValid(ChessPosition target) {
