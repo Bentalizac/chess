@@ -1,6 +1,5 @@
 package chess;
 
-import java.text.CollationElementIterator;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -60,6 +59,7 @@ public class ChessPiece {
         System.out.println(board);
         switch (piece.type) {
             case KING:
+                validMoves.addAll(kingMovement(board, myPosition));
                 break;
             case PAWN:
                 break;
@@ -87,26 +87,26 @@ public class ChessPiece {
     private Collection<ChessMove> diagonalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         // Up/right
-        validMoves.addAll(modularDiagonal(myPosition, board, 1, 1));
+        validMoves.addAll(linearMovement(myPosition, board, 1, 1));
         // down/right
-        validMoves.addAll(modularDiagonal(myPosition, board, 1, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
+        validMoves.addAll(linearMovement(myPosition, board, 1, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
         // Up/left
-        validMoves.addAll(modularDiagonal(myPosition, board, -1, 1));
+        validMoves.addAll(linearMovement(myPosition, board, -1, 1));
         // down/left
-        validMoves.addAll(modularDiagonal(myPosition, board, -1, -1));
+        validMoves.addAll(linearMovement(myPosition, board, -1, -1));
         return validMoves;
     }
 
     private Collection<ChessMove> cardinalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         // Up
-        validMoves.addAll(modularDiagonal(myPosition, board, 0, 1));
+        validMoves.addAll(linearMovement(myPosition, board, 0, 1));
         // down
-        validMoves.addAll(modularDiagonal(myPosition, board, 0, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
+        validMoves.addAll(linearMovement(myPosition, board, 0, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
         // left
-        validMoves.addAll(modularDiagonal(myPosition, board, -1, 0));
+        validMoves.addAll(linearMovement(myPosition, board, -1, 0));
         // right
-        validMoves.addAll(modularDiagonal(myPosition, board, 1, 0));
+        validMoves.addAll(linearMovement(myPosition, board, 1, 0));
         return validMoves;
     }
 
@@ -120,6 +120,21 @@ public class ChessPiece {
         validMoves.add(moveTo(board, myPosition, -1, 2));
         validMoves.add(moveTo(board, myPosition, 1, -2));
         validMoves.add(moveTo(board, myPosition, -1, -2));
+        return validMoves;
+    }
+
+    //private Collection<ChessMove> pawnMovement
+
+    private Collection<ChessMove> kingMovement(ChessBoard board, ChessPosition myPosition) { // TODO implement check restrictions after implementing threatened tiles
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        validMoves.add(moveTo(board, myPosition, 1, 1));
+        validMoves.add(moveTo(board, myPosition, 1, -1));
+        validMoves.add(moveTo(board, myPosition, -1, 1));
+        validMoves.add(moveTo(board, myPosition, -1, -1));
+        validMoves.add(moveTo(board, myPosition, 1, 0));
+        validMoves.add(moveTo(board, myPosition, -1, 0));
+        validMoves.add(moveTo(board, myPosition, 0, 1));
+        validMoves.add(moveTo(board, myPosition, 0, -1));
         return validMoves;
     }
 
@@ -147,7 +162,7 @@ public class ChessPiece {
 
 
 
-    private Collection<ChessMove> modularDiagonal(ChessPosition myPosition, ChessBoard board,int xModifier, int yModifier) {
+    private Collection<ChessMove> linearMovement(ChessPosition myPosition, ChessBoard board, int xModifier, int yModifier) {
         int x = myPosition.getColumn();
         int y = myPosition.getRow();
         HashSet<ChessMove> validMoves = new HashSet<>();
