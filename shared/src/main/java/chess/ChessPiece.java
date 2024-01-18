@@ -41,7 +41,7 @@ public class ChessPiece {
                 break;
             case PAWN:
                 this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'P': 'p');
-                //this.homeRow = this.getTeamColor() == ChessGame.TeamColor.BLACK &&
+                this.endRow = ((pieceColor == ChessGame.TeamColor.WHITE) ? 8: 1);
                 break;
             case null:
                 break;
@@ -162,28 +162,39 @@ public class ChessPiece {
 
         ChessPosition fwdTarget = new ChessPosition(y + direction, x);
         if (!board.occupied(fwdTarget)) {
-            validMoves.add((new ChessMove(myPosition, fwdTarget)));
+            validMoves.addAll(promotionMoves(myPosition, fwdTarget));
 
             if ((this.pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) | (this.pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)) { // Double movement arbitrator line
                 ChessPosition dblTarget = new ChessPosition(y + (2*direction), x);
-                if (!board.occupied(dblTarget)) {validMoves.add((new ChessMove(myPosition, dblTarget))); } // Nested if to check for initial double movement
+                if (!board.occupied(dblTarget)) {validMoves.addAll(promotionMoves(myPosition, dblTarget));; } // Nested if to check for initial double movement
             }
         }
         //Diagonal Movement
         ChessPosition westTarget = new ChessPosition(y + direction, x-1);
         if (board.occupied((westTarget)) && isEnemy(board.getPiece(westTarget))) {
-            validMoves.add(new ChessMove(myPosition, westTarget));
+            validMoves.addAll(promotionMoves(myPosition, westTarget));
         }
         ChessPosition eastTarget = new ChessPosition(y + direction, x+1);
         if (board.occupied((eastTarget)) && isEnemy(board.getPiece(eastTarget))) {
-            validMoves.add(new ChessMove(myPosition, eastTarget));
+            validMoves.addAll(promotionMoves(myPosition, eastTarget));
         }
-
-
 
         return validMoves;
     }
 
+    private Collection<ChessMove> promotionMoves(ChessPosition myPosition, ChessPosition target) {
+        HashSet<ChessMove> validMoves = new HashSet<>();
+
+        if (target.getRow() != this.endRow) {
+            validMoves.add(new ChessMove(myPosition, target));
+            return validMoves;
+        }
+        validMoves.add(new ChessMove(myPosition, target, PieceType.ROOK));
+        validMoves.add(new ChessMove(myPosition, target, PieceType.KNIGHT));
+        validMoves.add(new ChessMove(myPosition, target, PieceType.QUEEN));
+        validMoves.add(new ChessMove(myPosition, target, PieceType.BISHOP));
+        return validMoves;
+    }
 
     private Collection<ChessMove> kingMovement(ChessBoard board, ChessPosition myPosition) { // TODO implement check restrictions after implementing threatened tiles
         HashSet<ChessMove> validMoves = new HashSet<>();
