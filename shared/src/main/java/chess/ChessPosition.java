@@ -9,11 +9,6 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPosition {
-    private ChessPiece piece;
-    public boolean occupied = false;
-
-
-
 
     private final int row;
     private final int col;
@@ -34,30 +29,32 @@ public class ChessPosition {
     public int getColumn() {
         return this.col;
     }
-    public void setPiece(ChessPiece piece) {this.occupied = true;this.piece = piece;} /** TODO make sure the occupied value is set to false when a piece moves off*/
-    public ChessPiece getPiece() {return this.piece;}
+
 
     public boolean isEdge() {
         return this.row + 1 > 8 | this.row - 1 <= 0 | this.col + 1 > 8 | this.col - 1 <= 0;
     }
 
+
     @Override
     public String toString() {
-        return "[" + this.row + "/" + this.col +']';
+        return "ChessPosition{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPosition that = (ChessPosition) o;
-        return occupied == that.occupied && row == that.row && col == that.col && Objects.equals(piece, that.piece);
+        return row == that.row && col == that.col;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(piece, occupied, row, col);
+        return Objects.hash(row, col);
     }
 }
 

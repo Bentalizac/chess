@@ -11,13 +11,39 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private PieceType type;
-    private ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+    private final ChessGame.TeamColor pieceColor;
+
+    private char strRep;
 
     private Collection<ChessPosition> threats;
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
         this .pieceColor = pieceColor;
+
+        switch (this.type){
+            case KNIGHT:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'n': 'N');
+                break;
+            case BISHOP:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'b': 'B');
+                break;
+            case QUEEN:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'q': 'Q');
+                break;
+            case KING:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'k': 'K');
+                break;
+            case ROOK:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'r': 'R');
+                break;
+            case PAWN:
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'p': 'P');
+                break;
+            case null:
+                break;
+        }
+
     }
 
     /**
@@ -141,9 +167,12 @@ public class ChessPiece {
     private ChessMove moveTo(ChessBoard board, ChessPosition myPosition, int yMod, int xMod) {
         int y = myPosition.getRow() + yMod;
         int x = myPosition.getColumn() + xMod;
+        ChessPosition target = new ChessPosition(y, x);
         if (validCoords(y, x)) {
-            if (isValid(board.spaces[y][x])) {
-                return new ChessMove(myPosition, board.spaces[y][x]);
+
+            if (isValid(board, target)) {
+                return new ChessMove(myPosition, target);
+
             }
         }
         return null;
@@ -153,11 +182,11 @@ public class ChessPiece {
         return x <= 8 && x>0 && y <=8 && y> 0;
     }
 
-    private boolean isValid(ChessPosition target) {
-        if (!target.occupied){
+    private boolean isValid(ChessBoard board, ChessPosition target) {
+        if (!board.occupied(target)){
             return true;
         }
-        else return isEnemy(target);
+        else return isEnemy(board.getPiece(target));
     }
 
 
@@ -169,13 +198,14 @@ public class ChessPiece {
         while (x+xModifier <= 8 && x+xModifier > 0 && y + yModifier <= 8 && y + yModifier >0) {
             x = x + xModifier;
             y = y + yModifier;
-            ChessPosition target = board.spaces[y][x];
+            ChessPosition target = new ChessPosition(y, x);
+
             ChessMove newMove = new ChessMove(myPosition, target);
-            if (!target.occupied) {
+            if (!board.occupied(target)) {
                 validMoves.add(newMove);
             }
             else {
-                if (isEnemy((target))){
+                if (isEnemy((board.getPiece(target)))){
                     validMoves.add(newMove);
                 }
                 break;
@@ -184,19 +214,8 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private boolean isEnemy(ChessPosition target) { // Checks if a piece at a position is an enemy
-        return target.getPiece().getTeamColor() != this.getTeamColor();
-    }
+    private boolean isEnemy(ChessPiece target) { return target.getTeamColor() != this.getTeamColor();}
 
-    private Collection<ChessPosition> getThreats(Collection<ChessMove> validMoves) {
-        Collection<ChessPosition> threatenedTiles = new HashSet<>();
-        for (ChessMove tile : validMoves){
-            if (tile.getEndPosition().occupied && isEnemy(tile.getEndPosition())){
-                threatenedTiles.add(tile.getEndPosition());
-            }
-        }
-        return threatenedTiles;
-    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -212,9 +231,6 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "type='" + type + '\'' +
-                ", pieceColor='" + pieceColor + '\'' +
-                '}';
+        return String.valueOf(strRep);
     }
 }
