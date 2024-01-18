@@ -18,7 +18,7 @@ public class ChessPiece {
     private int endRow; // This only matters on a pawn, do not include in equals or hash
     //private boolean homeRow = false; // This only matters on a pawn, do not include in equals or hash
 
-    private Collection<ChessPosition> threats;
+    //private Collection<ChessPosition> threats;
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
         this.pieceColor = pieceColor;
@@ -166,7 +166,7 @@ public class ChessPiece {
 
             if ((this.pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) | (this.pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)) { // Double movement arbitrator line
                 ChessPosition dblTarget = new ChessPosition(y + (2*direction), x);
-                if (!board.occupied(dblTarget)) {validMoves.addAll(promotionMoves(myPosition, dblTarget));; } // Nested if to check for initial double movement
+                if (!board.occupied(dblTarget)) {validMoves.addAll(promotionMoves(myPosition, dblTarget)); } // Nested if to check for initial double movement
             }
         }
         //Diagonal Movement
