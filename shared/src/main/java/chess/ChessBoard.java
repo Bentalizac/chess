@@ -44,7 +44,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-
+        this.spaces = new ChessPiece[9][9];
         // R N B Q K B N R
 
         //Set white pawns;
@@ -88,7 +88,7 @@ public class ChessBoard {
     @Override
     public String toString() {
         String output = "CHESSBOARD:\n";
-        for (int y = 1; y <=8; y++) {
+        for (int y = 8; y > 0; y--) {
             for (int x = 1; x <=8; x++){
                 if(spaces[y][x] == null){
                     output += "[ ]";

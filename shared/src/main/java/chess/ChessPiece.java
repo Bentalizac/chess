@@ -14,31 +14,34 @@ public class ChessPiece {
     private final PieceType type;
     private final ChessGame.TeamColor pieceColor;
 
-    private char strRep;
+    private char strRep; // do not include in equals or hash
+    private int endRow; // This only matters on a pawn, do not include in equals or hash
+    //private boolean homeRow = false; // This only matters on a pawn, do not include in equals or hash
 
     private Collection<ChessPosition> threats;
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
-        this .pieceColor = pieceColor;
+        this.pieceColor = pieceColor;
 
         switch (this.type){
             case KNIGHT:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'n': 'N');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'N': 'n');
                 break;
             case BISHOP:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'b': 'B');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'B': 'b');
                 break;
             case QUEEN:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'q': 'Q');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'Q': 'q');
                 break;
             case KING:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'k': 'K');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'K': 'k');
                 break;
             case ROOK:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'r': 'R');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'R': 'r');
                 break;
             case PAWN:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'p': 'P');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'P': 'p');
+                //this.homeRow = this.getTeamColor() == ChessGame.TeamColor.BLACK &&
                 break;
             case null:
                 break;
@@ -88,6 +91,7 @@ public class ChessPiece {
                 validMoves.addAll(kingMovement(board, myPosition));
                 break;
             case PAWN:
+                validMoves.addAll(pawnMovement(board, myPosition));
                 break;
             case ROOK:
                 validMoves.addAll(cardinalMovement(board, myPosition));
@@ -149,7 +153,37 @@ public class ChessPiece {
         return validMoves;
     }
 
-    //private Collection<ChessMove> pawnMovement
+    private Collection<ChessMove> pawnMovement(ChessBoard board, ChessPosition myPosition) {
+
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        int direction = ((this.pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1);
+        int x = myPosition.getColumn();
+        int y = myPosition.getRow();
+
+        ChessPosition fwdTarget = new ChessPosition(y + direction, x);
+        if (!board.occupied(fwdTarget)) {
+            validMoves.add((new ChessMove(myPosition, fwdTarget)));
+
+            if ((this.pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) | (this.pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)) { // Double movement arbitrator line
+                ChessPosition dblTarget = new ChessPosition(y + (2*direction), x);
+                if (!board.occupied(dblTarget)) {validMoves.add((new ChessMove(myPosition, dblTarget))); } // Nested if to check for initial double movement
+            }
+        }
+        //Diagonal Movement
+        ChessPosition westTarget = new ChessPosition(y + direction, x-1);
+        if (board.occupied((westTarget)) && isEnemy(board.getPiece(westTarget))) {
+            validMoves.add(new ChessMove(myPosition, westTarget));
+        }
+        ChessPosition eastTarget = new ChessPosition(y + direction, x+1);
+        if (board.occupied((eastTarget)) && isEnemy(board.getPiece(eastTarget))) {
+            validMoves.add(new ChessMove(myPosition, eastTarget));
+        }
+
+
+
+        return validMoves;
+    }
+
 
     private Collection<ChessMove> kingMovement(ChessBoard board, ChessPosition myPosition) { // TODO implement check restrictions after implementing threatened tiles
         HashSet<ChessMove> validMoves = new HashSet<>();
@@ -169,10 +203,8 @@ public class ChessPiece {
         int x = myPosition.getColumn() + xMod;
         ChessPosition target = new ChessPosition(y, x);
         if (validCoords(y, x)) {
-
             if (isValid(board, target)) {
                 return new ChessMove(myPosition, target);
-
             }
         }
         return null;
