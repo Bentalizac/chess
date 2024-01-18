@@ -56,7 +56,6 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = this;
-        ChessPosition start = myPosition;
         HashSet<ChessMove> validMoves = new HashSet<>();
         System.out.println(board);
         switch (piece.type) {
@@ -109,12 +108,19 @@ public class ChessPiece {
         return validMoves;
     }
 
+    private Collection<ChessMove> knightMovement(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        return validMoves;
+    }
+
     private boolean isValid(ChessPosition target) {
         if (!target.occupied){
             return true;
         }
         else return isEnemy(target);
     }
+
+
 
     private Collection<ChessMove> modularDiagonal(ChessPosition myPosition, ChessBoard board,int xModifier, int yModifier) {
         int x = myPosition.getColumn();
