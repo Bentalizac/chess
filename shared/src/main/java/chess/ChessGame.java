@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,7 +12,13 @@ import java.util.Collection;
  */
 public class ChessGame {
 
+    private ChessBoard[] gameHistory;
+    private ChessBoard currentState;
+
+    private TeamColor currentPlayer;
     public ChessGame() {
+        this.setBoard(new ChessBoard());
+        this.setTeamTurn(TeamColor.WHITE);
 
     }
 
@@ -18,7 +26,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return this.currentPlayer;
     }
 
     /**
@@ -27,7 +35,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.currentPlayer = team;
     }
 
     /**
@@ -46,7 +54,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        return this.getBoard().getPieceMoves(startPosition);
     }
 
     /**
@@ -56,8 +64,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
+        HashSet<ChessMove> validMoves = new HashSet<>();
+        //if()
     }
+
+
 
     /**
      * Determines if the given team is in check
@@ -96,7 +108,8 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.currentState = board;
+        System.out.println(this);
     }
 
     /**
@@ -105,6 +118,27 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.currentState;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(currentState, chessGame.currentState) && currentPlayer == chessGame.currentPlayer;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentState, currentPlayer);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "currentState=" + currentState +
+                ", currentPlayer=" + currentPlayer +
+                "}";
     }
 }

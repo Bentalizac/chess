@@ -16,14 +16,13 @@ public class ChessPiece {
 
     private char strRep; // do not include in equals or hash
     private int endRow; // This only matters on a pawn, do not include in equals or hash
-    //private boolean homeRow = false; // This only matters on a pawn, do not include in equals or hash
 
     //private Collection<ChessPosition> threats;
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.type = type;
         this.pieceColor = pieceColor;
 
-        switch (this.type){
+        switch (this.type){ // debugging/toString, not needed for functionality
             case KNIGHT:
                 this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'N': 'n');
                 break;
@@ -48,7 +47,6 @@ public class ChessPiece {
         }
 
     }
-
     /**
      * The various different chess piece options
      */
@@ -85,7 +83,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = this;
         HashSet<ChessMove> validMoves = new HashSet<>();
-        System.out.println(board);
         switch (piece.type) {
             case KING:
                 validMoves.addAll(kingMovement(board, myPosition));
@@ -113,30 +110,29 @@ public class ChessPiece {
     return validMoves;
     }
 
-
     private Collection<ChessMove> diagonalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         // Up/right
-        validMoves.addAll(linearMovement(myPosition, board, 1, 1));
+        validMoves.addAll(linearMovement(board, myPosition, 1, 1));
         // down/right
-        validMoves.addAll(linearMovement(myPosition, board, 1, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
+        validMoves.addAll(linearMovement(board, myPosition, 1, -1));
         // Up/left
-        validMoves.addAll(linearMovement(myPosition, board, -1, 1));
+        validMoves.addAll(linearMovement(board, myPosition, -1, 1));
         // down/left
-        validMoves.addAll(linearMovement(myPosition, board, -1, -1));
+        validMoves.addAll(linearMovement(board, myPosition, -1, -1));
         return validMoves;
     }
 
     private Collection<ChessMove> cardinalMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         // Up
-        validMoves.addAll(linearMovement(myPosition, board, 0, 1));
+        validMoves.addAll(linearMovement(board, myPosition, 0, 1));
         // down
-        validMoves.addAll(linearMovement(myPosition, board, 0, -1)); // This isn't working. the iteration of the x and y values somehow makes the target tile the piece's current tile
+        validMoves.addAll(linearMovement(board, myPosition, 0, -1));
         // left
-        validMoves.addAll(linearMovement(myPosition, board, -1, 0));
+        validMoves.addAll(linearMovement(board, myPosition, -1, 0));
         // right
-        validMoves.addAll(linearMovement(myPosition, board, 1, 0));
+        validMoves.addAll(linearMovement(board, myPosition, 1, 0));
         return validMoves;
     }
 
@@ -163,7 +159,6 @@ public class ChessPiece {
         ChessPosition fwdTarget = new ChessPosition(y + direction, x);
         if (!board.occupied(fwdTarget)) {
             validMoves.addAll(promotionMoves(myPosition, fwdTarget));
-
             if ((this.pieceColor == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) | (this.pieceColor == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)) { // Double movement arbitrator line
                 ChessPosition dblTarget = new ChessPosition(y + (2*direction), x);
                 if (!board.occupied(dblTarget)) {validMoves.addAll(promotionMoves(myPosition, dblTarget)); } // Nested if to check for initial double movement
@@ -232,9 +227,7 @@ public class ChessPiece {
         else return isEnemy(board.getPiece(target));
     }
 
-
-
-    private Collection<ChessMove> linearMovement(ChessPosition myPosition, ChessBoard board, int xModifier, int yModifier) {
+    private Collection<ChessMove> linearMovement(ChessBoard board, ChessPosition myPosition, int xModifier, int yModifier) {
         int x = myPosition.getColumn();
         int y = myPosition.getRow();
         HashSet<ChessMove> validMoves = new HashSet<>();
@@ -242,7 +235,6 @@ public class ChessPiece {
             x = x + xModifier;
             y = y + yModifier;
             ChessPosition target = new ChessPosition(y, x);
-
             ChessMove newMove = new ChessMove(myPosition, target);
             if (!board.occupied(target)) {
                 validMoves.add(newMove);

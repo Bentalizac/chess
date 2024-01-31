@@ -13,6 +13,7 @@ public class ChessBoard {
 
     public ChessPiece[][] spaces;
     public ChessBoard() {
+
         this.spaces = new ChessPiece[9][9];
     }
     /**
@@ -82,6 +83,10 @@ public class ChessBoard {
         for (int i = 1; i <=8; i++){
             this.addPiece(new ChessPosition(8,i), blackPieces[i-1]);
         }
+    }
+
+    public Collection<ChessMove> getPieceMoves(ChessPosition myPosition) {
+        return this.getPiece(myPosition).pieceMoves(this, myPosition);
     }
 
 
