@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -66,7 +67,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
         HashSet<ChessMove> validMoves = new HashSet<>();
-        //if()
+
     }
 
 
@@ -77,8 +78,40 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
+
+    public ArrayList<ChessPosition> getThreatenedTiles(TeamColor teamColor) {
+        ArrayList<ChessPosition> threatenedTiles = new ArrayList<>();
+        switch (teamColor){
+            case WHITE:
+                threatenedTiles.addAll(this.currentState.blackMoveEnds(this.currentState));
+                break;
+            case BLACK:
+                threatenedTiles.addAll(this.currentState.whiteMoveEnds(this.currentState));
+                break;
+        }
+        return threatenedTiles;
+    }
+
+    public ArrayList<ChessPiece> getThreatenedPieces(ArrayList<ChessPosition> threatenedTiles, TeamColor teamColor){
+        ArrayList<ChessPiece> threatenedPieces = new ArrayList<>();
+        threatenedTiles.forEach(tile -> threatenedPieces.add(this.currentState.getPiece(tile))); //This doesn't threaten friendly pieces because those moves were never added to validMoves
+        threatenedPieces.removeIf(Objects::isNull);
+        return threatenedPieces;
+
+    }
+
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<ChessPosition> threatenedTiles = new ArrayList<>();
+        ArrayList<ChessPiece> threatenedPieces = new ArrayList<>();
+
+        threatenedTiles = getThreatenedTiles(teamColor);
+        threatenedPieces = getThreatenedPieces(threatenedTiles, teamColor);
+        for (ChessPiece piece : threatenedPieces) {
+            if( piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -65,10 +65,10 @@ public class ChessBoard {
         // Logic for storing the pieces.  TODO The chessgame will store the endpoints of the valid moves to calculate check and stuff
         switch(piece.getTeamColor()) {
             case WHITE:
-                this.whitePieces.add(piece);
+                this.whitePieces.add(position);
                 break;
             case BLACK:
-                this.blackPieces.add(piece);
+                this.blackPieces.add(position);
                 break;
         }
     }
