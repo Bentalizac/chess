@@ -13,13 +13,15 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    private ChessBoard[] gameHistory;
+    private ArrayList<ChessBoard> gameHistory;
     private ChessBoard currentState;
 
     private TeamColor currentPlayer;
     public ChessGame() {
         this.setBoard(new ChessBoard());
         this.setTeamTurn(TeamColor.WHITE);
+        this.gameHistory = new ArrayList<ChessBoard>();
+
 
     }
 
@@ -64,9 +66,30 @@ public class ChessGame {
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
+
+    private boolean validateMove(ChessMove move){
+        ChessPiece piece = this.currentState.getPiece(move.getStartPosition());
+
+        if (!this.futureSight(move)){ // Checks if move will leave own team in check.
+            return false;
+        }
+        return true;
+    }
+
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
-        HashSet<ChessMove> validMoves = new HashSet<>();
+        try {
+            if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {
+                throw new InvalidMoveException();
+            }
+        }
+        catch (InvalidMoveException ex){
+            System.out.println("INVALID MOVE");
+        }
+
+        this.currentState.removePiece(move.getStartPosition());
+        //Maybe TODO add flag if this was a capture move? Is that needed? If so, this is the spot for it.
+        this.currentState.addPiece(move.getEndPosition(), piece);
 
     }
 
@@ -103,7 +126,6 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         ArrayList<ChessPosition> threatenedTiles = new ArrayList<>();
         ArrayList<ChessPiece> threatenedPieces = new ArrayList<>();
-
         threatenedTiles = getThreatenedTiles(teamColor);
         threatenedPieces = getThreatenedPieces(threatenedTiles, teamColor);
         for (ChessPiece piece : threatenedPieces) {
@@ -112,6 +134,15 @@ public class ChessGame {
             }
         }
         return false;
+    }
+
+    private void updateHistory(){
+        this.gameHistory.add(this.currentState);
+    }
+    private boolean futureSight(ChessMove move) { // Generates the board state a move would create, and returns true if the move is valid and will not leave the current team in check
+
+
+        return true;
     }
 
     /**

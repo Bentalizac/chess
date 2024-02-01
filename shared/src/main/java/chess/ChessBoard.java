@@ -73,6 +73,10 @@ public class ChessBoard {
         }
     }
 
+    public void removePiece(ChessPosition position){
+        this.spaces[position.getRow()][position.getColumn()] = null;
+    }
+
 
 
     /**
@@ -164,6 +168,7 @@ public class ChessBoard {
         ChessBoard that = (ChessBoard) o;
         return Arrays.deepEquals(spaces, that.spaces);
     }
+
 
 
     @Override
