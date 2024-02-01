@@ -1,7 +1,10 @@
 package chess;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -11,11 +14,45 @@ import java.util.Collection;
  */
 public class ChessBoard {
 
-    public ChessPiece[][] spaces;
+    private ChessPiece[][] spaces;
+
+    private ArrayList<ChessPosition> whitePieces = new ArrayList<>();
+    private ArrayList<ChessPosition> blackPieces = new ArrayList<>();
+
     public ChessBoard() {
 
         this.spaces = new ChessPiece[9][9];
     }
+
+
+    public ArrayList<ChessPosition> getWhitePieces() {
+        return this.whitePieces;
+    }
+
+
+    public ArrayList<ChessPosition> getBlackPieces() {
+        return this.blackPieces;
+    }
+
+    // Finds the endpoints of each teams' possible moves to check for check.
+    public Collection<ChessPosition> whiteMoveEnds (ChessBoard board){
+        ArrayList<ChessPosition> whitePieces = board.getWhitePieces();
+        HashSet<ChessPosition> endPositions = new HashSet<>();
+        HashSet<ChessMove> whiteMoves = new HashSet<>();
+        whitePieces.forEach(position -> whiteMoves.addAll(board.getPiece(position).pieceMoves(board, position)));
+        whiteMoves.forEach(move -> endPositions.add(move.getEndPosition()));
+        return endPositions;
+    }
+
+    public Collection<ChessPosition> blackMoveEnds (ChessBoard board){
+        ArrayList<ChessPosition> blackPieces = board.getBlackPieces();
+        HashSet<ChessPosition> endPositions = new HashSet<>();
+        HashSet<ChessMove> blackMoves = new HashSet<>();
+        blackPieces.forEach(position -> blackMoves.addAll(board.getPiece(position).pieceMoves(board, position)));
+        blackMoves.forEach(move -> endPositions.add(move.getEndPosition()));
+        return endPositions;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -24,7 +61,20 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         this.spaces[position.getRow()][position.getColumn()] = piece;
+
+        // Logic for storing the pieces.  TODO The chessgame will store the endpoints of the valid moves to calculate check and stuff
+        switch(piece.getTeamColor()) {
+            case WHITE:
+                this.whitePieces.add(piece);
+                break;
+            case BLACK:
+                this.blackPieces.add(piece);
+                break;
+        }
     }
+
+
+
     /**
      * Gets a chess piece on the chessboard
      *
