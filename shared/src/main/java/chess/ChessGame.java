@@ -82,12 +82,13 @@ public class ChessGame {
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
-
         if (piece.getTeamColor() != this.currentPlayer | !validMoves(move.getStartPosition()).contains(move)) {// This test is potentially redundant, but only potentially.
             throw new InvalidMoveException();
         }
         this.currentState.updateArrays(move, piece);
-        this.movePiece(move, piece);
+        if(move.getPromotionPiece() != null){this.movePiece(move, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));}
+        else{
+        this.movePiece(move, piece);}
         this.updateHistory();
         this.changeTurn();
     }
@@ -161,7 +162,22 @@ public class ChessGame {
         return true;
     }
 
-
+    private HashSet<ChessMove> getTeamMoves(TeamColor teamColor){
+        var pieceList = new HashSet<ChessPosition>();
+        var moves = new HashSet<ChessMove>();
+        switch(teamColor){
+            case WHITE:
+                pieceList.addAll(this.currentState.getWhitePieces());
+                break;
+            case BLACK:
+                pieceList.addAll(this.currentState.getBlackPieces());
+                break;
+        }
+        for(ChessPosition position : pieceList){
+            moves.addAll(this.validMoves(position));
+        }
+        return moves;
+    }
 
     /**
      * Determines if the given team is in checkmate
@@ -170,7 +186,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        var moves = new HashSet<ChessMove>();
+        moves = getTeamMoves(teamColor);
+        return moves.isEmpty();
     }
 
     /**
@@ -181,7 +199,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        var moves = new HashSet<ChessMove>();
+        moves = getTeamMoves(teamColor);
+        return moves.isEmpty();
     }
 
     /**
