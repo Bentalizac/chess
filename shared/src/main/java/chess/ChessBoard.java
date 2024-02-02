@@ -16,8 +16,8 @@ public class ChessBoard {
 
     private ChessPiece[][] spaces;
 
-    private ArrayList<ChessPosition> whitePieces = new ArrayList<>();
-    private ArrayList<ChessPosition> blackPieces = new ArrayList<>();
+    private HashSet<ChessPosition> whitePieces = new HashSet<>();
+    private HashSet<ChessPosition> blackPieces = new HashSet<>();
 
     public ChessBoard() {
 
@@ -32,12 +32,12 @@ public class ChessBoard {
         this.spaces = spaces;
     }
 
-    public ArrayList<ChessPosition> getWhitePieces() {
+    public HashSet<ChessPosition> getWhitePieces() {
         return this.whitePieces;
     }
 
 
-    public ArrayList<ChessPosition> getBlackPieces() {
+    public HashSet<ChessPosition> getBlackPieces() {
         return this.blackPieces;
     }
 
@@ -68,7 +68,7 @@ public class ChessBoard {
 
     // Finds the endpoints of each teams' possible moves to check for check.
     public Collection<ChessPosition> whiteMoveEnds (ChessBoard board){
-        ArrayList<ChessPosition> whitePieces = board.getWhitePieces();
+        HashSet<ChessPosition> whitePieces = board.getWhitePieces();
         HashSet<ChessPosition> endPositions = new HashSet<>();
         HashSet<ChessMove> whiteMoves = new HashSet<>();
         whitePieces.forEach(position -> whiteMoves.addAll(board.getPiece(position).pieceMoves(board, position)));
@@ -77,8 +77,9 @@ public class ChessBoard {
     }
 
     public Collection<ChessPosition> blackMoveEnds (ChessBoard board){
-        ArrayList<ChessPosition> blackPieces = board.getBlackPieces();
+        HashSet<ChessPosition> blackPieces = board.getBlackPieces();
         HashSet<ChessPosition> endPositions = new HashSet<>();
+        System.out.println(this);
         HashSet<ChessMove> blackMoves = new HashSet<>();
         blackPieces.forEach(position -> blackMoves.addAll(board.getPiece(position).pieceMoves(board, position)));
         blackMoves.forEach(move -> endPositions.add(move.getEndPosition()));

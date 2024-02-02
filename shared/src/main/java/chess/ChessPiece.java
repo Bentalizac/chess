@@ -165,13 +165,17 @@ public class ChessPiece {
             }
         }
         //Diagonal Movement
-        ChessPosition westTarget = new ChessPosition(y + direction, x-1);
-        if (board.occupied((westTarget)) && isEnemy(board.getPiece(westTarget))) {
-            validMoves.addAll(promotionMoves(myPosition, westTarget));
+        if(validCoords(y+direction, x-1)) {
+            ChessPosition westTarget = new ChessPosition(y + direction, x - 1);
+            if (board.occupied((westTarget)) && isEnemy(board.getPiece(westTarget))) {
+                validMoves.addAll(promotionMoves(myPosition, westTarget));
+            }
         }
-        ChessPosition eastTarget = new ChessPosition(y + direction, x+1);
-        if (board.occupied((eastTarget)) && isEnemy(board.getPiece(eastTarget))) {
-            validMoves.addAll(promotionMoves(myPosition, eastTarget));
+        if(validCoords(y+direction, x+1)) {
+            ChessPosition eastTarget = new ChessPosition(y + direction, x + 1);
+            if (board.occupied((eastTarget)) && isEnemy(board.getPiece(eastTarget))) {
+                validMoves.addAll(promotionMoves(myPosition, eastTarget));
+            }
         }
 
         return validMoves;
