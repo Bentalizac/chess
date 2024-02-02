@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class ChessGame {
 
-    private ArrayList<ChessBoard> gameHistory;
+    private final ArrayList<ChessBoard> gameHistory;
     private ChessBoard currentState;
 
     private TeamColor currentPlayer;
@@ -63,7 +63,6 @@ public class ChessGame {
      * Makes a move in a chess game
      *
      * @param move chess move to preform
-     * @throws InvalidMoveException if move is invalid
      */
 
     private boolean isValidMove(ChessMove move){ // Primary purpose is basic validation and checking for check
@@ -124,7 +123,7 @@ public class ChessGame {
         return threatenedTiles;
     }
 
-    public ArrayList<ChessPiece> getThreatenedPieces(ArrayList<ChessPosition> threatenedTiles, TeamColor teamColor){
+    public ArrayList<ChessPiece> getThreatenedPieces(ArrayList<ChessPosition> threatenedTiles){
         ArrayList<ChessPiece> threatenedPieces = new ArrayList<>();
         threatenedTiles.forEach(tile -> threatenedPieces.add(this.currentState.getPiece(tile))); //This doesn't threaten friendly pieces because those moves were never added to validMoves
         threatenedPieces.removeIf(Objects::isNull);
@@ -132,10 +131,10 @@ public class ChessGame {
     }
 
     public boolean isInCheck(TeamColor teamColor) {
-        ArrayList<ChessPosition> threatenedTiles = new ArrayList<>();
-        ArrayList<ChessPiece> threatenedPieces = new ArrayList<>();
+        ArrayList<ChessPosition> threatenedTiles;
+        ArrayList<ChessPiece> threatenedPieces;
         threatenedTiles = getThreatenedTiles(teamColor);
-        threatenedPieces = getThreatenedPieces(threatenedTiles, teamColor);
+        threatenedPieces = getThreatenedPieces(threatenedTiles);
         for (ChessPiece piece : threatenedPieces) {
             if( piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                 return true;
@@ -145,7 +144,7 @@ public class ChessGame {
     }
 
     private void updateHistory(){
-        var spaces = this.getBoard().getSpaces();
+        this.getBoard().getSpaces();
         this.gameHistory.add(new ChessBoard(this.currentState));
     }
 
