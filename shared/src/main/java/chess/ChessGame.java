@@ -78,22 +78,29 @@ public class ChessGame {
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
-        try {
-            if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {
-                throw new InvalidMoveException();
-            }
-        }
-        catch (InvalidMoveException ex){
-            System.out.println("INVALID MOVE");
+
+        if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {
+            throw new InvalidMoveException();
         }
 
         this.currentState.removePiece(move.getStartPosition());
         //Maybe TODO add flag if this was a capture move? Is that needed? If so, this is the spot for it.
         this.currentState.addPiece(move.getEndPosition(), piece);
 
+
+        this.changeTurn();
     }
 
-
+    private void changeTurn(){
+        switch(this.getTeamTurn()){
+            case WHITE:
+                this.setTeamTurn(TeamColor.BLACK);
+                break;
+            case BLACK:
+                this.setTeamTurn(TeamColor.WHITE);
+                break;
+        }
+    }
 
     /**
      * Determines if the given team is in check
