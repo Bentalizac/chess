@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -13,14 +10,15 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    private ArrayList<ChessBoard> gameHistory;
+    private ArrayList<ChessPiece[][]> gameHistory;
     private ChessBoard currentState;
 
     private TeamColor currentPlayer;
     public ChessGame() {
         this.setBoard(new ChessBoard());
         this.setTeamTurn(TeamColor.WHITE);
-        this.gameHistory = new ArrayList<ChessBoard>();
+        this.gameHistory = new ArrayList<>();
+        this.updateHistory();
 
 
     }
@@ -76,18 +74,32 @@ public class ChessGame {
         return true;
     }
 
+    private void movePiece(ChessMove move, ChessPiece piece){
+        this.currentState.removePiece(move.getStartPosition());
+        //Maybe TODO add flag if this was a capture move? Is that needed? If so, this is the spot for it.
+        if(this.currentState.occupied(move.getEndPosition())){
+            this.currentState.removePiece(move.getEndPosition());
+        }
+        this.currentState.addPiece(move.getEndPosition(), piece);
+        switch(this.getTeamTurn()){ //list.set(list.indexOf(oldObject), newObject);
+            case WHITE:
+                ;
+                break;
+            case BLACK:
+                ;
+                break;
+        }
+    }
+
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
 
-        if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {
+        if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {// TODO add checkTest
             throw new InvalidMoveException();
         }
-
-        this.currentState.removePiece(move.getStartPosition());
-        //Maybe TODO add flag if this was a capture move? Is that needed? If so, this is the spot for it.
-        this.currentState.addPiece(move.getEndPosition(), piece);
-
-
+        this.currentState.updateArrays(move, piece);
+        this.movePiece(move, piece);
+        this.updateHistory();
         this.changeTurn();
     }
 
@@ -127,7 +139,6 @@ public class ChessGame {
         threatenedTiles.forEach(tile -> threatenedPieces.add(this.currentState.getPiece(tile))); //This doesn't threaten friendly pieces because those moves were never added to validMoves
         threatenedPieces.removeIf(Objects::isNull);
         return threatenedPieces;
-
     }
 
     public boolean isInCheck(TeamColor teamColor) {
@@ -144,7 +155,8 @@ public class ChessGame {
     }
 
     private void updateHistory(){
-        this.gameHistory.add(this.currentState);
+        var spaces = this.getBoard().getSpaces();
+        this.gameHistory.add(spaces);
     }
     private boolean futureSight(ChessMove move) { // Generates the board state a move would create, and returns true if the move is valid and will not leave the current team in check
 

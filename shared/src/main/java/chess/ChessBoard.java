@@ -24,6 +24,13 @@ public class ChessBoard {
         this.spaces = new ChessPiece[9][9];
     }
 
+    public ChessPiece[][] getSpaces() {
+        return spaces;
+    }
+
+    public void setSpaces(ChessPiece[][] spaces) {
+        this.spaces = spaces;
+    }
 
     public ArrayList<ChessPosition> getWhitePieces() {
         return this.whitePieces;
@@ -32,6 +39,31 @@ public class ChessBoard {
 
     public ArrayList<ChessPosition> getBlackPieces() {
         return this.blackPieces;
+    }
+
+    public void updateArrays(ChessMove move, ChessPiece piece){ //Updates the arrays storing the location of each team's pieces. Called from makeMove
+        //list.set(list.indexOf(oldObject), newObject);
+        switch(piece.getTeamColor()){ //list.set(list.indexOf(oldObject), newObject);
+            case WHITE:
+                this.whitePieces.remove(move.getStartPosition());
+                this.whitePieces.add(move.getEndPosition());
+                break;
+            case BLACK:
+                this.blackPieces.remove(move.getStartPosition());
+                this.blackPieces.add(move.getEndPosition());
+                break;
+        }
+    }
+    public void capturePiece(ChessPosition target){
+        ChessPiece capturedPiece = this.getPiece(target);
+        switch(capturedPiece.getTeamColor()){ //list.set(list.indexOf(oldObject), newObject);
+            case WHITE:
+                this.whitePieces.remove(target);
+                break;
+            case BLACK:
+                this.blackPieces.remove(target);
+                break;
+        }
     }
 
     // Finds the endpoints of each teams' possible moves to check for check.
