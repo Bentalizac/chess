@@ -10,17 +10,15 @@ import java.util.*;
  */
 public class ChessGame {
 
-    private ArrayList<ChessPiece[][]> gameHistory;
+    private ArrayList<ChessBoard> gameHistory;
     private ChessBoard currentState;
 
     private TeamColor currentPlayer;
     public ChessGame() {
+        this.gameHistory = new ArrayList<>();
         this.setBoard(new ChessBoard());
         this.setTeamTurn(TeamColor.WHITE);
-        this.gameHistory = new ArrayList<>();
         this.updateHistory();
-
-
     }
 
     /**
@@ -55,7 +53,10 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        return this.getBoard().getPieceMoves(startPosition);
+        HashSet<ChessMove> validMoves = (HashSet<ChessMove>) this.getBoard().getPieceMoves(startPosition);
+
+        validMoves.removeIf(move -> !isValidMove(move)); // Iterates over generated validMoves and checks for check/team
+        return validMoves;
     }
 
     /**
@@ -65,36 +66,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
 
-    private boolean validateMove(ChessMove move){
-        ChessPiece piece = this.currentState.getPiece(move.getStartPosition());
-
-        if (!this.futureSight(move)){ // Checks if move will leave own team in check.
-            return false;
-        }
-        return true;
+    private boolean isValidMove(ChessMove move){ // Primary purpose is basic validation and checking for check
+        return futureSight(move, this.currentState.getPiece(move.getStartPosition()));
     }
 
     private void movePiece(ChessMove move, ChessPiece piece){
         this.currentState.removePiece(move.getStartPosition());
-        //Maybe TODO add flag if this was a capture move? Is that needed? If so, this is the spot for it.
         if(this.currentState.occupied(move.getEndPosition())){
+            this.currentState.capturePiece(move.getEndPosition());
             this.currentState.removePiece(move.getEndPosition());
         }
         this.currentState.addPiece(move.getEndPosition(), piece);
-        switch(this.getTeamTurn()){ //list.set(list.indexOf(oldObject), newObject);
-            case WHITE:
-                ;
-                break;
-            case BLACK:
-                ;
-                break;
-        }
+
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = this.getBoard().getPiece(move.getStartPosition());
 
-        if (piece.getTeamColor() != this.currentPlayer | !piece.pieceMoves(this.currentState, move.getStartPosition()).contains(move)) {// TODO add checkTest
+        if (piece.getTeamColor() != this.currentPlayer | !validMoves(move.getStartPosition()).contains(move)) {// This test is potentially redundant, but only potentially.
             throw new InvalidMoveException();
         }
         this.currentState.updateArrays(move, piece);
@@ -156,13 +145,23 @@ public class ChessGame {
 
     private void updateHistory(){
         var spaces = this.getBoard().getSpaces();
-        this.gameHistory.add(spaces);
+        this.gameHistory.add(new ChessBoard(this.currentState));
     }
-    private boolean futureSight(ChessMove move) { // Generates the board state a move would create, and returns true if the move is valid and will not leave the current team in check
 
-
+    private void rollback(){ // This does not update the lists of pieces, and as such neither should any hypothetical moves
+        this.currentState = new ChessBoard(this.gameHistory.get(gameHistory.size()-1)); // Make a new copy of the most recently saved game state
+    }
+    private boolean futureSight(ChessMove move, ChessPiece piece) { // Generates the board state a move would create, and returns true if the move is valid and will not leave the current team in check
+        this.movePiece(move, piece);
+        if(isInCheck(piece.getTeamColor())){
+            this.rollback();
+            return false;
+        }
+        this.rollback();
         return true;
     }
+
+
 
     /**
      * Determines if the given team is in checkmate
@@ -193,6 +192,7 @@ public class ChessGame {
     public void setBoard(ChessBoard board) {
         this.currentState = board;
         System.out.println(this);
+        this.updateHistory();
     }
 
     /**

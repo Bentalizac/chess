@@ -20,8 +20,38 @@ public class ChessBoard {
     private HashSet<ChessPosition> blackPieces = new HashSet<>();
 
     public ChessBoard() {
+        this.spaces = new ChessPiece[9][9];
+    }
+
+    public ChessBoard(ChessBoard oldBoard) { // Takes a board, makes a deep copy of all parts of it.
+
+        this.whitePieces = new HashSet<>();
+        this.blackPieces = new HashSet<>();
+
+        for(ChessPosition position : oldBoard.blackPieces) {
+            this.blackPieces.add(new ChessPosition(position.getRow(), position.getColumn()));
+        }
+        for(ChessPosition position : oldBoard.whitePieces) {
+            this.whitePieces.add(new ChessPosition(position.getRow(), position.getColumn()));
+        }
 
         this.spaces = new ChessPiece[9][9];
+        int i = 0;
+        for (ChessPiece[] arr : oldBoard.spaces){
+            this.spaces[i] = new ChessPiece[9];
+            int j = 0;
+            for (ChessPiece piece : arr){
+                if(piece != null){
+                    this.spaces[i][j] = piece.copy();}
+                else{
+                    this.spaces[i][j] = null;
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+
+
     }
 
     public ChessPiece[][] getSpaces() {

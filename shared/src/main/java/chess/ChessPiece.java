@@ -255,6 +255,10 @@ public class ChessPiece {
 
     private boolean isEnemy(ChessPiece target) { return target.getTeamColor() != this.getTeamColor();}
 
+    ChessPiece copy(){
+        return new ChessPiece(this.pieceColor, this.getPieceType());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
