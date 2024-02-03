@@ -109,7 +109,7 @@ public class ChessBoard {
     public Collection<ChessPosition> blackMoveEnds (ChessBoard board){
         HashSet<ChessPosition> blackPieces = board.getBlackPieces();
         HashSet<ChessPosition> endPositions = new HashSet<>();
-        System.out.println(this);
+        //System.out.println(this);
         HashSet<ChessMove> blackMoves = new HashSet<>();
         blackPieces.forEach(position -> blackMoves.addAll(board.getPiece(position).pieceMoves(board, position)));
         blackMoves.forEach(move -> endPositions.add(move.getEndPosition()));

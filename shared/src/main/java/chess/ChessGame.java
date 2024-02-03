@@ -210,7 +210,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.currentState = board;
-        System.out.println(this);
+        //System.out.println(this);
         this.updateHistory();
     }
 
