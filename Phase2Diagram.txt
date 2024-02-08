@@ -1,0 +1,10 @@
+title Phase 2 Diagram
+
+
+Client -> Server: 
+Server -> Handlers:
+Handlers -> Services:
+Services -> DataAccess:
+Services -> Models:
+DataAccess ->Models:
+DataAccess -> DataBase:
