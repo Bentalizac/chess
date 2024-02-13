@@ -1,10 +1,115 @@
-title Phase 2 Diagram
+actor Client
+participant Server
+participant Service
+participant DataAccess
+database db
 
+group #navy Registration #white
+Client -> Server: [POST] /user\n{username, password, email}
+Server -> Service: register(username, password, email)
+Service -> DataAccess: getUser(username)
+DataAccess -> db: SELECT username from user
+DataAccess --> Service: null
+Service -> DataAccess: createUser(username, password)
+DataAccess -> db: INSERT username, password, email INTO user
+Service -> DataAccess: createAuth(username)
+DataAccess -> db: INSERT username, authToken INTO auth
+DataAccess --> Service: authToken
+Service --> Server: authToken
+Server --> Client: 200\n{authToken}
+end
 
-Client -> Server: 
-Server -> Handlers:
-Handlers -> Services:
-Services -> DataAccess:
-Services -> Models:
-DataAccess ->Models:
-DataAccess -> DataBase:
+group #orange Login #white
+Client -> Server: [POST] /session\n{username, password}
+Server->Service:login(username, password)
+DataAccess->db
+DataAccess-->Server
+Service ->DataAccess
+Service->DataAccess:verifyUser(username, password)
+DataAccess ->db:SELECT username, password FROM user
+DataAccess -->Service
+Service<--DataAccess:True\n
+Service->DataAccess:generateAuthToken()
+DataAccess->db:INSERT authToken, username INTO auth
+Server -->Server
+DataAccess-->Service:authToken
+Server<--Service:authToken
+Server-->Client: 200 \n{authToken}
+end
+
+group #green Logout #white
+Client -> Server: [DELETE] /session\nauthToken
+Server->Service:logout(authToken)
+Service ->DataAccess:getAuthToken(authToken)
+DataAccess ->db:SELECT authToken, * FROM auth
+DataAccess -->Service:authData\n
+Service ->DataAccess: logout(authToken)
+DataAccess -> db: REMOVE authToken FROM auth
+DataAccess -->Service: 200
+Service -->Server: 200
+Client<--Server:200\n
+end
+
+group #red List Games #white
+Client -> Server: [GET] /game\nauthToken
+Server -->Server
+Server->Service:getGames(authToken)
+
+Service ->DataAccess:getAuthToken(authToken)
+DataAccess ->db:SELECT authToken, * FROM auth
+DataAccess -->Service:authData\n
+Service->DataAccess:getGames()
+DataAccess ->db: SELECT games FROM games
+Service<--DataAccess:games
+Service-->Server:games
+Server -->Client: 200\n{games}
+
+end
+
+group #purple Create Game #white
+Client -> Server: [POST] /game\nauthToken\n{gameName}
+Server->Service
+Server->Service:createGame(gameName, authToken)
+Service ->DataAccess:getAuthToken(authToken)
+DataAccess ->db:SELECT authToken, * FROM auth
+DataAccess -->Service:authData\n
+Service->DataAccess:newGame(gameName, gameID)
+DataAccess ->db:INSERT gameName, gameID INTO games
+Service<--  DataAccess:true
+Service-->Server:gameId
+Server -->Client :200\n{gameId]
+
+end
+
+group #yellow Join Game #black
+Client -> Server: [PUT] /game\nauthToken\n{ClientColor, gameID}
+Server->Service:joinGame(clientColor, gameID,authToken)
+
+Service ->DataAccess:getAuthToken(authToken)
+DataAccess ->db:SELECT authToken, * FROM auth
+DataAccess -->Service:authData\n
+Service->DataAccess
+DataAccess -> db
+Service<--DataAccess
+Service->DataAccess:getGame(gameID)
+DataAccess -> db: SELECT gameID FROM games
+Service<-DataAccess:game
+Server --> Server
+Service->Service
+Service->DataAccess:updatePlayers(game)
+DataAccess->db:UPDATE playerColors INTO games
+Service<--DataAccess:true
+Service-->Server:true
+Server->Client: 200
+end
+
+group #gray Clear application #white
+Client -> Server: [DELETE] /db
+Server->Service:deleteData()
+Service->DataAccess:deleteData()
+DataAccess -> db: REMOVE * from *
+Service<--DataAccess:true
+Service-->Server:200
+Server -->Client:200
+
+end
