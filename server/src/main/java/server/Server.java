@@ -27,6 +27,9 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
 
+        Spark.delete("/data", this::deleteAllData);
+
+
         Spark.awaitInitialization();
         return Spark.port();
     }
