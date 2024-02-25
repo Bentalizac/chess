@@ -25,5 +25,17 @@ public class UserServiceTests {
         assertTrue(allUsers.contains(user));
     }
 
+    @Test
+    void userAlreadyExists() throws ResponseException {
+        UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
+        AuthData returnValue = service.createUser(user);
+
+
+        ResponseException exception = assertThrows(ResponseException.class, service.createUser(user));
+        int expectedCode = 300;
+        assertEquals(exception.StatusCode(), (int) expectedCode);
+
+    }
+
 
 }

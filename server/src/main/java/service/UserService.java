@@ -17,7 +17,7 @@ public class UserService implements ChessService{
         dataAccess = new MemoryDataAccess();
     }
 
-    public AuthData createUser(UserData data) {
+    public AuthData createUser(UserData data) throws ResponseException{
         UserData existingData = dataAccess.getUser(data.userName());
         if(existingData == null){
             dataAccess.createUser(data);
@@ -25,9 +25,7 @@ public class UserService implements ChessService{
             AuthData newAuthData = dataAccess.createAuth(data.userName(), authToken);
             return newAuthData;
         }
-        else{
-            return dataAccess.getAuth(data.userName());
-        }
+        else throw new ResponseException(300, "USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
         return dataAccess.getAllUsers();
