@@ -1,22 +1,23 @@
 package server;
 
-import dataAccess.DataAccess;
+import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
-import service.ChessService;
 import model.UserData;
-import model.AuthData;
-import model.GameData;
+import service.ChessService;
+import com.google.gson.Gson;
 
+import service.UserService;
 import spark.*;
 
-import javax.xml.crypto.Data;
 import java.util.Map;
 
 public class Server {
-    private final ChessService service;
+    private final UserService userService;
+    // TODO Add auth and game services next
 
-    public Server(DataAccess dataAccess) {
-        service = new ChessService(dataAccess);
+    public Server() {
+        var dataAccess = new MemoryDataAccess();
+        userService = new UserService();
         // There's a line about websockets next
     }
 
@@ -28,6 +29,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         Spark.delete("/data", this::deleteAllData);
+        Spark.post("/addUser", this::addUser);
 
 
         Spark.awaitInitialization();
@@ -38,9 +40,22 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+    public int port() {
+        return Spark.port();
+    }
 
-    private Object deleteAllData(Request req, Response res) throws ResponseException {
-        service.deleteAllData();
+    public Object addUser(Request req, Response res) throws ResponseException {
+        var user = new Gson().fromJson(req.body(), UserData.class);
+
+
+
+        user = userService.createUser(user);
+        return new Gson().toJson(user);
+
+    }
+
+    public Object deleteAllData(Request req, Response res) throws ResponseException {
+        userService.deleteAllData();
         res.status(204);
         return "";
     }
