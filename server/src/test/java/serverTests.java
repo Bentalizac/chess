@@ -31,14 +31,14 @@ public class serverTests {
     //Petshop code has a facade, here, what is that and do I need it here?
     //static ServerFacade server;
 
-    private final String serverUrl;
+    private static String serverUrl;
 
     @BeforeAll
     static void startServer() throws Exception{
         testServer = new Server();
         testServer.run(0);
         var url = "http://localhost:" + testServer.port();
-        this.serverUrl = url;
+        serverUrl = url;
         //server = new ServerFacade(url);
     }
 
@@ -50,9 +50,6 @@ public class serverTests {
         var testUser = new UserData("JuanPablo", "password", "yee@haw.com");
 
         String path = "/addUser";
-
-
-        var result = assertDoesNotThrow(() -> testServer.addUser());
     }
 
 
@@ -60,7 +57,7 @@ public class serverTests {
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
-            URL url = (new URI(this.serverUrl + path)).toURL();
+            URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
@@ -112,4 +109,4 @@ public class serverTests {
 }
 
 
-}
+

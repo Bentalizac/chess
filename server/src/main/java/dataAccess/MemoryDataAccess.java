@@ -1,5 +1,6 @@
 package dataAccess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -26,6 +27,15 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     public UserData getUser(String username) {return userData.get(username);}
+
+    public ArrayList<UserData> getAllUsers() {
+        ArrayList<UserData> output = new ArrayList<>();
+        for (String key: userData.keySet()) {
+            output.add(userData.get(key));
+        }
+        return output;
+    }
+
     public AuthData getAuth(String username) {return authData.get(username);}
 
     public void clearData() {

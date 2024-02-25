@@ -2,6 +2,7 @@ package server;
 
 import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 import service.ChessService;
 import com.google.gson.Gson;
@@ -23,7 +24,7 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
+        System.out.println("SERVER SPOOLED UP");
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
@@ -45,11 +46,9 @@ public class Server {
     }
 
     public Object addUser(Request req, Response res) throws ResponseException {
-        var user = new Gson().fromJson(req.body(), UserData.class);
+        UserData user = new Gson().fromJson(req.body(), UserData.class);
 
-
-
-        user = userService.createUser(user);
+        AuthData userAuth = userService.createUser(user);
         return new Gson().toJson(user);
 
     }

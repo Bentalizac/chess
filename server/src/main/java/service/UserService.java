@@ -5,7 +5,9 @@ import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.UUID;
+
 
 public class UserService implements ChessService{
 
@@ -27,10 +29,9 @@ public class UserService implements ChessService{
             return dataAccess.getAuth(data.userName());
         }
     }
-
-
-
-
+    public ArrayList<UserData> getUsers() {
+        return dataAccess.getAllUsers();
+    }
     public void deleteAllData() throws ResponseException {
         this.dataAccess.clearData();
     }
