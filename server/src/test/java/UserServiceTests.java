@@ -18,22 +18,22 @@ public class UserServiceTests {
     void addUser() throws ResponseException {
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
         AuthData returnValue = service.createUser(user);
-
         var allUsers = service.getUsers();
-
         assertEquals(1, allUsers.size());
         assertTrue(allUsers.contains(user));
     }
+    @Test
+    void userAlreadyExists() throws ResponseException { // Negative addUser() test
+        UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
+        AuthData returnValue = service.createUser(user);
+        assertThrows(ResponseException.class, () -> {service.createUser(user);}, "USER ALREADY EXISTS");
+    }
 
     @Test
-    void userAlreadyExists() throws ResponseException {
+    void login() throws ResponseException {
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
         AuthData returnValue = service.createUser(user);
 
-
-        ResponseException exception = assertThrows(ResponseException.class, service.createUser(user));
-        int expectedCode = 300;
-        assertEquals(exception.StatusCode(), (int) expectedCode);
 
     }
 

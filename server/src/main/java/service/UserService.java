@@ -33,4 +33,9 @@ public class UserService implements ChessService{
     public void deleteAllData() throws ResponseException {
         this.dataAccess.clearData();
     }
+
+    public AuthData login(String username, String password) {
+
+    }
+
 }
