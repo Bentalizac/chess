@@ -22,7 +22,7 @@ public class MemoryDataAccess implements DataAccess{
         userData.put(user.userName(), user);
     }
 
-    public AuthData createAuth(String username, String authToken){
+    public AuthData login(String username, String authToken){
         var data = new AuthData(authToken, username);
         authData.put(username, data);
         return data;
@@ -41,14 +41,21 @@ public class MemoryDataAccess implements DataAccess{
     public AuthData getAuth(String username) {return authData.get(username);}
 
 
-    public AuthData getUserByAuth(String authtoken) throws ResponseException {
+    public AuthData getUserByAuth(String authtoken) {
         for (String key: authData.keySet()) {
             AuthData datum = authData.get(key);
+            if(datum == null) {
+                return datum;
+            }
             if (Objects.equals(datum.authToken(), authtoken)) {
                 return datum;
             }
         }
-        throw ResponseException(404)
+        return null;
+    }
+
+    public void logout(AuthData data) {
+        authData.put(data.userName(), null);
     }
 
     public void clearData() {

@@ -15,11 +15,13 @@ public interface DataAccess {
 
     ArrayList<UserData> getAllUsers();
 
-    AuthData createAuth(String username, String authToken);
+    AuthData login(String username, String authToken);
 
     AuthData getUserByAuth(String authtoken) throws ResponseException;
 
     void createUser(UserData user);
+
+    void logout(AuthData data);
 
 
 

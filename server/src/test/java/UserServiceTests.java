@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.UserService;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
@@ -33,8 +35,29 @@ public class UserServiceTests {
     void login() throws ResponseException {
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
         AuthData returnValue = service.createUser(user);
+    }
 
+    @Test
+    void logout() throws ResponseException {
+        UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
+        AuthData returnValue = service.createUser(user);
+         // in this case we have access to both the username and the authtoken, but that might not always be true
+        assertDoesNotThrow(()->{service.logout(returnValue.authToken());});
+    }
 
+    @Test
+    void logoutNonexistantUser() throws ResponseException {
+        UserData user = new UserData("JohnCena", "youcantseeme", "playsthemeonkazoo@weewoo.org");
+        String bad_token = UUID.randomUUID().toString(); // The odds that this works as a valid token are so astromomically low it is a non issue
+        assertThrows(ResponseException.class, ()-> {service.logout(bad_token);}, "USER NOT FOUND");
+    }
+
+    @Test
+    void logoutTwice() throws ResponseException {
+        UserData user = new UserData("JohnCena", "youcantseeme", "playsthemeonkazoo@weewoo.org");
+        AuthData returnValue = service.createUser(user);
+        service.logout(returnValue.authToken());
+        assertThrows(ResponseException.class, ()-> {service.logout(returnValue.authToken());}, "USER NOT LOGGED IN");
     }
 
 

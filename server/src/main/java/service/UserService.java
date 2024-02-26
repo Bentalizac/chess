@@ -22,10 +22,10 @@ public class UserService implements ChessService{
         if(existingData == null){
             dataAccess.createUser(data);
             String authToken = UUID.randomUUID().toString();
-            AuthData newAuthData = dataAccess.createAuth(data.userName(), authToken);
+            AuthData newAuthData = dataAccess.login(data.userName(), authToken);
             return newAuthData;
         }
-        else throw new ResponseException(300, "USER ALREADY EXISTS");
+        else throw new ResponseException(409, "USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
         return dataAccess.getAllUsers();
@@ -38,8 +38,15 @@ public class UserService implements ChessService{
         return null;
     }
 
-    public void logout(String authToken) {
-        UserData data = dataAccess.getUserByAuth(authToken);
+    public void logout(String authToken) throws ResponseException{
+        AuthData data = dataAccess.getUserByAuth(authToken);
+        if(data == null) {
+            throw new ResponseException(404, "USER NOT FOUND");
+        }
+        else if(data.authToken() == null) {
+            throw new ResponseException(403, "USER NOT LOGGED IN");
+        }
+        dataAccess.logout(data);
     }
 
 }
