@@ -24,6 +24,7 @@ public class UserServiceTests {
         assertEquals(1, allUsers.size());
         assertTrue(allUsers.contains(user));
     }
+
     @Test
     void userAlreadyExists() throws ResponseException { // Negative addUser() test
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
@@ -34,7 +35,23 @@ public class UserServiceTests {
     @Test
     void login() throws ResponseException {
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
-        AuthData returnValue = service.createUser(user);
+        AuthData userAuth = service.createUser(user);
+        service.logout(userAuth.authToken());
+        assertDoesNotThrow(()-> service.login(user.userName(), user.password()));
+
+    }
+
+    @Test
+    void loginBadUser() throws ResponseException {
+        assertThrows(ResponseException.class, ()-> {service.login("JaneNotHere", "correctPassword");}, "USER NOT FOUND");
+    }
+
+    @Test
+    void loginBadPassword() throws ResponseException {
+        UserData data = new UserData("JaneHere", "correctPassword", "email@email.email");
+        AuthData userAuth = service.createUser(data);
+        service.logout(userAuth.authToken()); // Logout safe to use here because it has been shown to work
+        assertThrows(ResponseException.class, ()-> {service.login("JaneHere", "incorrectPassword");}, "USER NOT FOUND");
     }
 
     @Test
