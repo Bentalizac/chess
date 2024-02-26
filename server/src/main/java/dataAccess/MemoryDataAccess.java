@@ -3,7 +3,9 @@ package dataAccess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 
+import exception.ResponseException;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
@@ -37,6 +39,17 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     public AuthData getAuth(String username) {return authData.get(username);}
+
+
+    public AuthData getUserByAuth(String authtoken) throws ResponseException {
+        for (String key: authData.keySet()) {
+            AuthData datum = authData.get(key);
+            if (Objects.equals(datum.authToken(), authtoken)) {
+                return datum;
+            }
+        }
+        throw ResponseException(404)
+    }
 
     public void clearData() {
         userData.clear();

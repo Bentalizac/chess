@@ -35,7 +35,11 @@ public class UserService implements ChessService{
     }
 
     public AuthData login(String username, String password) {
+        return null;
+    }
 
+    public void logout(String authToken) {
+        UserData data = dataAccess.getUserByAuth(authToken);
     }
 
 }
