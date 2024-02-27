@@ -22,7 +22,7 @@ public class MemoryDataAccess implements DataAccess{
 
     public AuthData login(String username, String authToken){
         var data = new AuthData(authToken, username);
-        authData.put(username, data);
+        authData.put(authToken, data);
         return data;
     }
 
@@ -39,20 +39,11 @@ public class MemoryDataAccess implements DataAccess{
 
 
     public AuthData getUserByAuth(String authtoken) {
-        for (String key: authData.keySet()) {
-            AuthData datum = authData.get(key);
-            if(datum == null) {
-                return null;
-            }
-            if (Objects.equals(datum.authToken(), authtoken)) {
-                return datum;
-            }
-        }
-        return null;
+        return authData.get(authtoken);
     }
 
     public void logout(AuthData data) {
-        authData.put(data.username(), null);
+        authData.put(data.authToken(), null);
     }
 
     public void clearData() {
