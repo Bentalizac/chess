@@ -28,6 +28,7 @@ public class Server {
         Spark.delete("/db", this::deleteAllData);
         Spark.post("/user", this::addUser);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -48,6 +49,10 @@ public class Server {
         res.status(ex.StatusCode());
     }
 
+    private String exceptionToString(ResponseException ex) {
+        return "{ \"message\": \"" + ex.getMessage() + "\" }";
+    } //Generates the JSON string that needs to be passed back from an exception
+
     public Object addUser(Request req, Response res) throws ResponseException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData userAuth = null;
@@ -58,12 +63,8 @@ public class Server {
         }
         catch (ResponseException ex) {
             exceptionHandler(ex, req, res);
-            return "{ \"message\": \"" + ex.getMessage() + "\" }";
+            return exceptionToString(ex);
         }
-
-
-
-
     }
 
     public Object deleteAllData(Request req, Response res) throws ResponseException {
@@ -75,7 +76,6 @@ public class Server {
     public Object login(Request req, Response res) throws ResponseException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         System.out.println(user.username());
-
         AuthData authData = null;
         try {
             authData = userService.login(user.username(), user.password());
@@ -84,9 +84,21 @@ public class Server {
             return new Gson().toJson(authData);
         } catch (ResponseException ex) {
             exceptionHandler(ex, req, res);
-
-            return "{ \"message\": \"" + ex.getMessage() + "\" }";
+            return exceptionToString(ex);
         }
-
     }
+
+    public Object logout(Request req, Response res) {
+        String userToken = req.headers("authorization");
+        try{
+            userService.logout(userToken);
+            res.status(200);
+            return "{}";
+        }
+        catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return exceptionToString(ex);
+        }
+    }
+
 }
