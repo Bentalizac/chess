@@ -62,7 +62,7 @@ public class UserService implements ChessService{
     public void logout(String authToken) throws ResponseException{
         AuthData data = dataAccess.getUserByAuth(authToken);
         if(data == null) {
-            throw new ResponseException(404, "error: USER NOT FOUND");
+            throw new ResponseException(401, "error: USER NOT FOUND");
         }
         else if(data.authToken() == null) {
             throw new ResponseException(500, "error: USER NOT LOGGED IN");
