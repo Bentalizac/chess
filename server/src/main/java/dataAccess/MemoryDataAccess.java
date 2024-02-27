@@ -2,7 +2,7 @@ package dataAccess;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+
 
 import model.UserData;
 import model.AuthData;
@@ -18,6 +18,10 @@ public class MemoryDataAccess implements DataAccess{
 
     public void createUser(UserData user) {
         userData.put(user.username(), user);
+    }
+
+    public int getNextID() {
+        return this.nextGameId;
     }
 
     public AuthData login(String username, String authToken){
@@ -60,4 +64,10 @@ public class MemoryDataAccess implements DataAccess{
         }
         return output;
     }
+
+    public void createGame(GameData newGame) {
+        gameData.put(newGame.gameID(), newGame);
+        this.nextGameId += 1;
+    }
+
 }

@@ -14,17 +14,41 @@ import java.util.UUID;
 
 public class GameService {
 
+    // This class touches nothing in the ChessGame game field of the gameData record class. That may need to be changed later
     private final MemoryDataAccess dataAccess;
 
-    public GameService() {dataAccess = new MemoryDataAccess();}
-
-    private Boolean isAuthorized(String authToken) {
-        AuthData dbToken = dataAccess.getUserByAuth(authToken);
-        return dbToken != null && dbToken.authToken() != null;
+    public GameService(MemoryDataAccess dataAccess) {
+        this.dataAccess = dataAccess;
     }
 
-    public ArrayList<GameData> getGames() {
+    private AuthData isAuthorized(String authToken) {
+        return dataAccess.getUserByAuth(authToken);
+    }
+
+    private GameData buildNewGame(String gameName) { // Builds blank GameData records
+        int gameID = dataAccess.getNextID();
+        return new GameData(gameID, null, null, gameName, null);
+    }
+
+    public int createGame(String gameName, String authToken) throws ResponseException {
+        AuthData authorization = isAuthorized(authToken);
+        if (authorization == null || authorization.authToken() == null) {
+            throw new ResponseException(401, "error: TOKEN NOT AUTHORIZED");
+        }
+        GameData game = this.buildNewGame(gameName);
+        dataAccess.createGame(game);
+        return game.gameID();
+    }
+
+    private ArrayList<GameData> getGames() {
         return dataAccess.getGames();
     }
 
+    public ArrayList<GameData> listGames(String authToken) throws ResponseException {
+        AuthData authorization = isAuthorized(authToken);
+        if (authorization == null || authorization.authToken() == null) {
+            throw new ResponseException(401, "error: TOKEN NOT AUTHORIZED");
+        }
+        return this.getGames();
+    }
 }

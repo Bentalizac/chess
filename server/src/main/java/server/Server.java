@@ -15,7 +15,7 @@ public class Server {
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
-        userService = new UserService();
+        userService = new UserService(dataAccess);
         // There's a line about websockets next
     }
 

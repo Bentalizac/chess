@@ -17,8 +17,8 @@ public class UserService{
 
 
 
-    public UserService(){
-        dataAccess = new MemoryDataAccess();
+    public UserService(MemoryDataAccess dataAccess){
+        this.dataAccess = dataAccess;
     }
 
     private String generatePassword() {
@@ -29,11 +29,9 @@ public class UserService{
         UserData existingData = dataAccess.getUser(data.username());
 
         if(existingData == null){
-
             if(data.password() == null || data.email() == null || data.username() == null) {
                 throw new ResponseException(400, "error: INPUT FIELD MISSING");
             }
-
             dataAccess.createUser(data);
             String authToken = this.generatePassword();
             AuthData newAuthData = dataAccess.login(data.username(), authToken);

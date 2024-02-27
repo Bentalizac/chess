@@ -1,3 +1,4 @@
+import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
-    static final UserService service = new UserService();
+    static MemoryDataAccess dataAccess = new MemoryDataAccess();
+    static final UserService service = new UserService(dataAccess);
 
     @BeforeEach
     void clear() throws ResponseException {
