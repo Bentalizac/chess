@@ -24,13 +24,14 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-        System.out.println("SERVER SPOOLED UP");
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
 
-        Spark.delete("/data", this::deleteAllData);
-        Spark.post("/addUser", this::addUser);
+        Spark.delete("/db", this::deleteAllData);
+        Spark.post("/user", this::addUser);
+        Spark.post("/session", this::login);
+
 
 
         Spark.awaitInitialization();
@@ -54,8 +55,23 @@ public class Server {
 
     public Object deleteAllData(Request req, Response res) throws ResponseException {
         userService.deleteAllData();
-        res.status(204);
+        res.status(200);
         return "";
+    }
+
+    public Object login(Request req, Response res) throws ResponseException {
+        UserData user = new Gson().fromJson(req.body(), UserData.class);
+        System.out.println(user.userName());
+        try {
+            AuthData authData = userService.login(user.userName(), user.password());
+        }
+        catch(ResponseException response) {
+            if(response.StatusCode() == 401) {
+
+            }
+        }
+
+        return null;
     }
 
 }

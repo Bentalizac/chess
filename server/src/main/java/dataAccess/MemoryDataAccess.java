@@ -38,14 +38,13 @@ public class MemoryDataAccess implements DataAccess{
         return output;
     }
 
-    public AuthData getAuth(String username) {return authData.get(username);}
 
 
     public AuthData getUserByAuth(String authtoken) {
         for (String key: authData.keySet()) {
             AuthData datum = authData.get(key);
             if(datum == null) {
-                return datum;
+                return null;
             }
             if (Objects.equals(datum.authToken(), authtoken)) {
                 return datum;

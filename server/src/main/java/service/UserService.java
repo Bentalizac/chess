@@ -44,7 +44,7 @@ public class UserService implements ChessService{
     public AuthData login(String username, String password) throws ResponseException{
         UserData user = dataAccess.getUser(username);
         if(user == null) {
-            throw new ResponseException(404, "USER NOT FOUND");
+            throw new ResponseException(500, "USER NOT FOUND");
         }
         else if (!Objects.equals(user.password(), password)) {
             throw new ResponseException(401, "INCORRECT PASSWORD");
