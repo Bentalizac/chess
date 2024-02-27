@@ -67,6 +67,22 @@ public class GameServiceTests {
         assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
     }
 
+    @Test
+    void joinOccupiedPlayer()throws ResponseException {
+        String testname = "testgame";
+        int gameID = service.createGame(testname, this.testAuthToken);
+        JoinGameRequest testJoin = new JoinGameRequest("WHITE", gameID);
+        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
+
+        assertThrows(ResponseException.class, ()-> {service.joinGame(testJoin, this.testAuthToken);}, "error: USER ALREADY TAKEN");
+    }
+    @Test
+    void joinNonexistantGame() throws ResponseException {
+        int gameID = 334223;
+        JoinGameRequest testJoin = new JoinGameRequest(null, gameID);
+        assertThrows(ResponseException.class, ()-> {service.joinGame(testJoin, this.testAuthToken);}, "error: GAME DOES NOT EXIST");
+    }
+
 
 
 }
