@@ -51,7 +51,7 @@ public class Server {
     public Object addUser(Request req, Response res) throws ResponseException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         AuthData userAuth = userService.createUser(user);
-        return new Gson().toJson(user);
+        return new Gson().toJson(userAuth);
 
     }
 
