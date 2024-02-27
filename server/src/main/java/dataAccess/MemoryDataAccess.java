@@ -40,8 +40,9 @@ public class MemoryDataAccess implements DataAccess{
         return authData.get(authtoken);
     }
 
+
     public void logout(AuthData data) {
-        authData.put(data.authToken(), null);
+        authData.remove(data.authToken());
     }
 
     public void clearData() {
