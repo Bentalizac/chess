@@ -21,18 +21,20 @@ public class GameServiceTests {
 
     private static final UserData existingUser = new UserData("existingUser", "correctPassword", "valid@email.com");
 
-    AuthData positiveSetup() throws ResponseException {
+    void positiveSetup() throws ResponseException {
         //UserData existingUser = new UserData("existingUser", "correctPassword", "valid@email.com");
         AuthData returnValue = userService.createUser(existingUser);
         var allUsers = userService.getUsers();
         assertEquals(1, allUsers.size());
         assertTrue(allUsers.contains(existingUser));
-        return returnValue;
+        this.testAuthToken = returnValue.authToken();
+        //return returnValue;
     }
 
     @BeforeEach
     void clear() throws ResponseException {
         userService.deleteAllData();
+        this.positiveSetup();
     }
 
 
@@ -40,12 +42,14 @@ public class GameServiceTests {
     @Test
     void createGame() throws ResponseException {
         String testname = "testgame";
-        AuthData returnValue = userService.createUser(existingUser);
-        var allUsers = userService.getUsers();
-        assertEquals(1, allUsers.size());
-        assertTrue(allUsers.contains(existingUser));
+        assertDoesNotThrow( ()-> {service.createGame(testname, this.testAuthToken);} );
+    }
 
-        assertDoesNotThrow( ()-> {service.createGame(testname, returnValue.authToken());} );
+    @Test
+    void createGameBadAuth() throws ResponseException {
+        String testname = "testgame";
+        assertThrows(ResponseException.class, ()-> {service.createGame(testname, "BADAUTH");}, "error: TOKEN NOT AUTHORIZED");
+
     }
 
 
