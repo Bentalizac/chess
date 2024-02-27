@@ -3,19 +3,24 @@ package server;
 import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import com.google.gson.Gson;
 
+import service.GameService;
 import service.UserService;
 import spark.*;
 
 public class Server {
     private final UserService userService;
+    private final GameService gameService;
     // TODO Add auth and game services next
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
+
         // There's a line about websockets next
     }
 
@@ -29,6 +34,8 @@ public class Server {
         Spark.post("/user", this::addUser);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+
+        Spark.post("/game", this::createGame);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -106,6 +113,21 @@ public class Server {
 
     public Object listGames(Request req, Response res) {
         return null;
+    }
+
+    public Object createGame(Request req, Response res) {
+        String userToken = req.headers("authorization");
+        GameData data = new Gson().fromJson(req.body(), GameData.class);
+
+        try {
+            int gameID = gameService.createGame(data.gameName(), userToken);
+            res.status(200);
+            return "{ \"gameID\": \"" + String.valueOf(gameID) + "\" }";
+        }
+        catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return exceptionToString(ex);
+        }
     }
 
 

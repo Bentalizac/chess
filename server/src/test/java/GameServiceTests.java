@@ -49,7 +49,6 @@ public class GameServiceTests {
     void createGameBadAuth() throws ResponseException {
         String testname = "testgame";
         assertThrows(ResponseException.class, ()-> {service.createGame(testname, "BADAUTH");}, "error: TOKEN NOT AUTHORIZED");
-
     }
 
 
