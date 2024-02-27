@@ -4,13 +4,10 @@ import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
-import service.ChessService;
 import com.google.gson.Gson;
 
 import service.UserService;
 import spark.*;
-
-import java.util.Map;
 
 public class Server {
     private final UserService userService;
@@ -32,6 +29,7 @@ public class Server {
         Spark.post("/user", this::addUser);
         Spark.post("/session", this::login);
 
+        Spark.exception(ResponseException.class, this::exceptionHandler);
 
 
         Spark.awaitInitialization();
@@ -44,6 +42,10 @@ public class Server {
     }
     public int port() {
         return Spark.port();
+    }
+
+    private void exceptionHandler(ResponseException ex, Request req, Response res) { // Yoinked from petshop
+        res.status(ex.StatusCode());
     }
 
     public Object addUser(Request req, Response res) throws ResponseException {
@@ -61,17 +63,18 @@ public class Server {
 
     public Object login(Request req, Response res) throws ResponseException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
-        System.out.println(user.userName());
+        System.out.println(user.username());
+
+        AuthData authData = null;
         try {
-            AuthData authData = userService.login(user.userName(), user.password());
+            authData = userService.login(user.username(), user.password());
+            res.status(200);
+            res.body(new Gson().toJson(authData));
+            return new Gson().toJson(authData);
+        } catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return "";
         }
-        catch(ResponseException response) {
-            if(response.StatusCode() == 401) {
 
-            }
-        }
-
-        return null;
     }
-
 }

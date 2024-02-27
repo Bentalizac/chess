@@ -37,7 +37,7 @@ public class UserServiceTests {
         UserData user = new UserData("JuanPablo", "password", "yee@haw.com");
         AuthData userAuth = service.createUser(user);
         service.logout(userAuth.authToken());
-        assertDoesNotThrow(()-> service.login(user.userName(), user.password()));
+        assertDoesNotThrow(()-> service.login(user.username(), user.password()));
 
     }
 

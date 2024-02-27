@@ -1,11 +1,9 @@
 package dataAccess;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 
-import exception.ResponseException;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
@@ -19,7 +17,7 @@ public class MemoryDataAccess implements DataAccess{
     final private HashMap<Integer, GameData> gameData = new HashMap<>();
 
     public void createUser(UserData user) {
-        userData.put(user.userName(), user);
+        userData.put(user.username(), user);
     }
 
     public AuthData login(String username, String authToken){
@@ -54,7 +52,7 @@ public class MemoryDataAccess implements DataAccess{
     }
 
     public void logout(AuthData data) {
-        authData.put(data.userName(), null);
+        authData.put(data.username(), null);
     }
 
     public void clearData() {
