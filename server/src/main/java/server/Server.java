@@ -12,6 +12,8 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.Map;
+
 public class Server {
     private final UserService userService;
     private final GameService gameService;
@@ -36,6 +38,8 @@ public class Server {
         Spark.delete("/session", this::logout);
 
         Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
+        Spark.get("/game", this::listGames);
 
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -87,8 +91,9 @@ public class Server {
         try {
             authData = userService.login(user.username(), user.password());
             res.status(200);
-            //res.body(new Gson().toJson(authData));
+
             return new Gson().toJson(authData);
+
         } catch (ResponseException ex) {
             exceptionHandler(ex, req, res);
             return exceptionToString(ex);
@@ -112,7 +117,17 @@ public class Server {
     //              GAME METHODS
 
     public Object listGames(Request req, Response res) {
-        return null;
+        String userToken = req.headers("authorization");
+        try {
+            var games = gameService.listGames(userToken);
+            res.status(200);
+            String json = new Gson().toJson(Map.of("games", games));
+            return json;
+        }
+        catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return exceptionToString(ex);
+        }
     }
 
     public Object createGame(Request req, Response res) {
@@ -134,7 +149,15 @@ public class Server {
         String userToken = req.headers("authorization");
         JoinGameRequest data = new Gson().fromJson(req.body(), JoinGameRequest.class);
 
-        return null;
+        try{
+            gameService.joinGame(data, userToken);
+            res.status(200);
+            return "{}";
+        }
+        catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return exceptionToString(ex);
+        }
     }
 
 

@@ -5,12 +5,8 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
-import model.UserData;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
 
 
 public class GameService {
@@ -65,19 +61,22 @@ public class GameService {
         if (existingGame == null) {
             throw new ResponseException(400, "error: GAME DOES NOT EXIST");
         }
-        if (info.ClientColor() != null) {
+        if (info.playerColor() != null) {
             GameData newGameData = null;
-            if(info.ClientColor().equals("BLACK")) {
+            if(info.playerColor().equals("BLACK")) {
                 if (existingGame.blackUsername() != null){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
                 newGameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authorization.username(), existingGame.gameName(), existingGame.game());
             }
-            else if(info.ClientColor().equals("WHITE")) {
+            else if(info.playerColor().equals("WHITE")) {
                 if (existingGame.whiteUsername() != null){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
                 newGameData = new GameData(existingGame.gameID(),  authorization.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
+            }
+            else{
+                throw new ResponseException(403, "error: BAD COLOR");
             }
             dataAccess.updateGame(newGameData);
         }
