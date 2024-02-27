@@ -32,7 +32,7 @@ public class UserService implements ChessService{
             AuthData newAuthData = dataAccess.login(data.username(), authToken);
             return newAuthData;
         }
-        else throw new ResponseException(409, "error: USER ALREADY EXISTS");
+        else throw new ResponseException(403, "error: USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
         return dataAccess.getAllUsers();

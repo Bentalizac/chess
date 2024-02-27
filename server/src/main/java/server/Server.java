@@ -50,8 +50,19 @@ public class Server {
 
     public Object addUser(Request req, Response res) throws ResponseException {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
-        AuthData userAuth = userService.createUser(user);
-        return new Gson().toJson(userAuth);
+        AuthData userAuth = null;
+        try {
+            userAuth = userService.createUser(user);
+            res.status(200);
+            return new Gson().toJson(userAuth);
+        }
+        catch (ResponseException ex) {
+            exceptionHandler(ex, req, res);
+            return "{ \"message\": \"" + ex.getMessage() + "\" }";
+        }
+
+
+
 
     }
 
