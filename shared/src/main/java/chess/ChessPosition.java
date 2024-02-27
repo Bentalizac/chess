@@ -30,9 +30,6 @@ public class ChessPosition {
     }
 
 
-    public boolean isEdge() {
-        return this.row + 1 > 8 | this.row - 1 <= 0 | this.col + 1 > 8 | this.col - 1 <= 0;
-    }
 
 
     @Override

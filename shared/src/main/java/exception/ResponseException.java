@@ -8,7 +8,7 @@ public class ResponseException extends Exception { // This is the petshop code, 
         this.statusCode = statusCode;
     }
 
-    public int StatusCode() {
+    public int statusCode() {
         return statusCode;
     }
 }

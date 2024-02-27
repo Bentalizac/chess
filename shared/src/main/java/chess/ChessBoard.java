@@ -58,9 +58,6 @@ public class ChessBoard {
         return spaces;
     }
 
-    public void setSpaces(ChessPiece[][] spaces) {
-        this.spaces = spaces;
-    }
 
     public HashSet<ChessPosition> getWhitePieces() {
         return this.whitePieces;

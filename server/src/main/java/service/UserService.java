@@ -5,7 +5,6 @@ import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
@@ -34,15 +33,14 @@ public class UserService{
             }
             dataAccess.createUser(data);
             String authToken = this.generatePassword();
-            AuthData newAuthData = dataAccess.login(data.username(), authToken);
-            return newAuthData;
+            return dataAccess.login(data.username(), authToken);
         }
         else throw new ResponseException(403, "error: USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
         return dataAccess.getAllUsers();
     }
-    public void deleteAllData() throws ResponseException {
+    public void deleteAllData() {
         this.dataAccess.clearData();
     }
 

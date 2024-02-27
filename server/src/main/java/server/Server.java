@@ -54,7 +54,7 @@ public class Server {
     }
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) { // Yoinked from petshop
-        res.status(ex.StatusCode());
+        res.status(ex.statusCode());
     }
 
     private String exceptionToString(ResponseException ex) {
