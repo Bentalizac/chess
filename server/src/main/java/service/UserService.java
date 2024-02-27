@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 
-public class UserService implements ChessService{
+public class UserService{
 
     private final MemoryDataAccess dataAccess;
 
