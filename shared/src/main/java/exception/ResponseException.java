@@ -1,6 +1,6 @@
 package exception;
 
-public class ResponseException extends Exception { // This is the petshop code, it seems to be general purpose so I pasted it over here. TODO likely needs to be tweaked to this implementation
+public class ResponseException extends Exception { // This is the petshop code, it seems to be general purpose so I pasted it over here.
     final private int statusCode;
 
     public ResponseException(int statusCode, String message) {

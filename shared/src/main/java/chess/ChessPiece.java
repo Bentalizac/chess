@@ -195,7 +195,7 @@ public class ChessPiece {
         return validMoves;
     }
 
-    private Collection<ChessMove> kingMovement(ChessBoard board, ChessPosition myPosition) { // TODO implement check restrictions after implementing threatened tiles
+    private Collection<ChessMove> kingMovement(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validMoves = new HashSet<>();
         validMoves.add(moveTo(board, myPosition, 1, 1));
         validMoves.add(moveTo(board, myPosition, 1, -1));

@@ -122,7 +122,7 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         this.spaces[position.getRow()][position.getColumn()] = piece;
 
-        // Logic for storing the pieces.  TODO The chessgame will store the endpoints of the valid moves to calculate check and stuff
+        // Logic for storing the pieces.
         switch(piece.getTeamColor()) {
             case WHITE:
                 this.whitePieces.add(position);

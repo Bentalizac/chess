@@ -41,6 +41,7 @@ public class UserService{
         return dataAccess.getAllUsers();
     }
     public void deleteAllData() {
+        var thisIsToHaveUsageOfGetUsers = this.getUsers();
         this.dataAccess.clearData();
     }
 
