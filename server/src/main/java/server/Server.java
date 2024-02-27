@@ -4,6 +4,7 @@ import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
+import model.JoinGameRequest;
 import model.UserData;
 import com.google.gson.Gson;
 
@@ -14,7 +15,6 @@ import spark.*;
 public class Server {
     private final UserService userService;
     private final GameService gameService;
-    // TODO Add auth and game services next
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
@@ -128,6 +128,13 @@ public class Server {
             exceptionHandler(ex, req, res);
             return exceptionToString(ex);
         }
+    }
+
+    public Object joinGame(Request req, Response res) {
+        String userToken = req.headers("authorization");
+        JoinGameRequest data = new Gson().fromJson(req.body(), JoinGameRequest.class);
+
+        return null;
     }
 
 

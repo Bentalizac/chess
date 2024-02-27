@@ -65,9 +65,17 @@ public class MemoryDataAccess implements DataAccess{
         return output;
     }
 
+    public GameData getGame(int gameID){
+        return gameData.get(gameID);
+    }
+
     public void createGame(GameData newGame) {
         gameData.put(newGame.gameID(), newGame);
         this.nextGameId += 1;
+    }
+
+    public void updateGame(GameData game) {
+        gameData.put(game.gameID(),game);
     }
 
 }

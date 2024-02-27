@@ -2,6 +2,7 @@ import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
+import model.JoinGameRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,21 @@ public class GameServiceTests {
     void createGameBadAuth() throws ResponseException {
         String testname = "testgame";
         assertThrows(ResponseException.class, ()-> {service.createGame(testname, "BADAUTH");}, "error: TOKEN NOT AUTHORIZED");
+    }
+
+    @Test
+    void watchGame() throws ResponseException {
+        String testname = "testgame";
+        int gameID = service.createGame(testname, this.testAuthToken);
+        JoinGameRequest testJoin = new JoinGameRequest(null, gameID);
+        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
+    }
+    @Test
+    void whiteJoinGame() throws ResponseException {
+        String testname = "testgame";
+        int gameID = service.createGame(testname, this.testAuthToken);
+        JoinGameRequest testJoin = new JoinGameRequest("WHITE", gameID);
+        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
     }
 
 

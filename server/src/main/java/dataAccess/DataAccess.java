@@ -30,6 +30,10 @@ public interface DataAccess {
 
     void createGame(GameData game);
 
+    GameData getGame(int gameID);
+
+    void updateGame(GameData game);
+
 
 
 }

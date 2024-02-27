@@ -4,6 +4,7 @@ import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
+import model.JoinGameRequest;
 import model.UserData;
 
 import java.lang.reflect.Field;
@@ -44,6 +45,8 @@ public class GameService {
         return dataAccess.getGames();
     }
 
+    private GameData getGame(int gameID) { return dataAccess.getGame(gameID);}
+
     public ArrayList<GameData> listGames(String authToken) throws ResponseException {
         AuthData authorization = isAuthorized(authToken);
         if (authorization == null || authorization.authToken() == null) {
@@ -51,4 +54,37 @@ public class GameService {
         }
         return this.getGames();
     }
+
+    public void joinGame(JoinGameRequest info, String authToken) throws ResponseException{
+        AuthData authorization = isAuthorized(authToken);
+        if (authorization == null || authorization.authToken() == null) {
+            throw new ResponseException(401, "error: TOKEN NOT AUTHORIZED");
+        }
+        GameData existingGame = dataAccess.getGame(info.gameID());
+
+        if (existingGame == null) {
+            throw new ResponseException(400, "error: GAME DOES NOT EXIST");
+        }
+        if (info.ClientColor() != null) {
+            GameData newGameData = null;
+            if(info.ClientColor().equals("BLACK")) {
+                if (existingGame.blackUsername() != null){
+                    throw new ResponseException(403, "error: USER ALREADY TAKEN");
+                }
+                newGameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authorization.username(), existingGame.gameName(), existingGame.game());
+            }
+            else if(info.ClientColor().equals("WHITE")) {
+                if (existingGame.whiteUsername() != null){
+                    throw new ResponseException(403, "error: USER ALREADY TAKEN");
+                }
+                newGameData = new GameData(existingGame.gameID(),  authorization.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
+            }
+            dataAccess.updateGame(newGameData);
+        }
+
+
+    }
+
+
+
 }
