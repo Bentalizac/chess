@@ -69,11 +69,12 @@ public class Server {
         try {
             authData = userService.login(user.username(), user.password());
             res.status(200);
-            res.body(new Gson().toJson(authData));
+            //res.body(new Gson().toJson(authData));
             return new Gson().toJson(authData);
         } catch (ResponseException ex) {
             exceptionHandler(ex, req, res);
-            return "";
+
+            return "{ \"message\": \"" + ex.getMessage() + "\" }";
         }
 
     }

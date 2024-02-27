@@ -32,7 +32,7 @@ public class UserService implements ChessService{
             AuthData newAuthData = dataAccess.login(data.username(), authToken);
             return newAuthData;
         }
-        else throw new ResponseException(409, "USER ALREADY EXISTS");
+        else throw new ResponseException(409, "error: USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
         return dataAccess.getAllUsers();
@@ -44,10 +44,10 @@ public class UserService implements ChessService{
     public AuthData login(String username, String password) throws ResponseException{
         UserData user = dataAccess.getUser(username);
         if(user == null) {
-            throw new ResponseException(500, "USER NOT FOUND");
+            throw new ResponseException(401, "error: USER NOT FOUND");
         }
         else if (!Objects.equals(user.password(), password)) {
-            throw new ResponseException(401, "INCORRECT PASSWORD");
+            throw new ResponseException(401, "error: INCORRECT PASSWORD");
         }
         return dataAccess.login(username, this.generatePassword());
     }
@@ -55,10 +55,10 @@ public class UserService implements ChessService{
     public void logout(String authToken) throws ResponseException{
         AuthData data = dataAccess.getUserByAuth(authToken);
         if(data == null) {
-            throw new ResponseException(404, "USER NOT FOUND");
+            throw new ResponseException(404, "error: USER NOT FOUND");
         }
         else if(data.authToken() == null) {
-            throw new ResponseException(500, "USER NOT LOGGED IN");
+            throw new ResponseException(500, "error: USER NOT LOGGED IN");
         }
         dataAccess.logout(data);
     }
