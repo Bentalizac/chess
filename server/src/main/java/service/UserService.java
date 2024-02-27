@@ -5,6 +5,7 @@ import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
@@ -26,7 +27,13 @@ public class UserService implements ChessService{
 
     public AuthData createUser(UserData data) throws ResponseException{
         UserData existingData = dataAccess.getUser(data.username());
+
         if(existingData == null){
+
+            if(data.password() == null || data.email() == null || data.username() == null) {
+                throw new ResponseException(400, "error: INPUT FIELD MISSING");
+            }
+
             dataAccess.createUser(data);
             String authToken = this.generatePassword();
             AuthData newAuthData = dataAccess.login(data.username(), authToken);
