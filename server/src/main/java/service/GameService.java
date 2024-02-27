@@ -41,8 +41,6 @@ public class GameService {
         return dataAccess.getGames();
     }
 
-    private GameData getGame(int gameID) { return dataAccess.getGame(gameID);}
-
     public ArrayList<GameData> listGames(String authToken) throws ResponseException {
         AuthData authorization = isAuthorized(authToken);
         if (authorization == null || authorization.authToken() == null) {
@@ -62,7 +60,7 @@ public class GameService {
             throw new ResponseException(400, "error: GAME DOES NOT EXIST");
         }
         if (info.playerColor() != null) {
-            GameData newGameData = null;
+            GameData newGameData;
             if(info.playerColor().equals("BLACK")) {
                 if (existingGame.blackUsername() != null){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");

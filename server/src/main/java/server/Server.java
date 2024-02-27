@@ -52,9 +52,6 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-    public int port() {
-        return Spark.port();
-    }
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) { // Yoinked from petshop
         res.status(ex.StatusCode());
@@ -64,9 +61,9 @@ public class Server {
         return "{ \"message\": \"" + ex.getMessage() + "\" }";
     } //Generates the JSON string that needs to be passed back from an exception
 
-    public Object addUser(Request req, Response res) throws ResponseException {
+    public Object addUser(Request req, Response res) {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
-        AuthData userAuth = null;
+        AuthData userAuth;
         try {
             userAuth = userService.createUser(user);
             res.status(200);
@@ -84,10 +81,10 @@ public class Server {
         return "";
     }
 
-    public Object login(Request req, Response res) throws ResponseException {
+    public Object login(Request req, Response res) {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
         System.out.println(user.username());
-        AuthData authData = null;
+        AuthData authData;
         try {
             authData = userService.login(user.username(), user.password());
             res.status(200);
@@ -121,8 +118,7 @@ public class Server {
         try {
             var games = gameService.listGames(userToken);
             res.status(200);
-            String json = new Gson().toJson(Map.of("games", games));
-            return json;
+            return new Gson().toJson(Map.of("games", games));
         }
         catch (ResponseException ex) {
             exceptionHandler(ex, req, res);
@@ -137,7 +133,7 @@ public class Server {
         try {
             int gameID = gameService.createGame(data.gameName(), userToken);
             res.status(200);
-            return "{ \"gameID\": \"" + String.valueOf(gameID) + "\" }";
+            return "{ \"gameID\": \"" + gameID + "\" }";
         }
         catch (ResponseException ex) {
             exceptionHandler(ex, req, res);

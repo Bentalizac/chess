@@ -1,7 +1,6 @@
 import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
-import model.GameData;
 import model.JoinGameRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,15 +40,15 @@ public class GameServiceTests {
 
 
     @Test
-    void createGame() throws ResponseException {
+    void createGame() {
         String testname = "testgame";
         assertDoesNotThrow( ()-> {service.createGame(testname, this.testAuthToken);} );
     }
 
     @Test
-    void createGameBadAuth() throws ResponseException {
+    void createGameBadAuth() {
         String testname = "testgame";
-        assertThrows(ResponseException.class, ()-> {service.createGame(testname, "BADAUTH");}, "error: TOKEN NOT AUTHORIZED");
+        assertThrows(ResponseException.class, ()-> service.createGame(testname, "BADAUTH"), "error: TOKEN NOT AUTHORIZED");
     }
 
     @Test
@@ -57,14 +56,14 @@ public class GameServiceTests {
         String testname = "testgame";
         int gameID = service.createGame(testname, this.testAuthToken);
         JoinGameRequest testJoin = new JoinGameRequest(null, gameID);
-        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
+        assertDoesNotThrow(()-> service.joinGame(testJoin, this.testAuthToken));
     }
     @Test
     void whiteJoinGame() throws ResponseException {
         String testname = "testgame";
         int gameID = service.createGame(testname, this.testAuthToken);
         JoinGameRequest testJoin = new JoinGameRequest("WHITE", gameID);
-        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
+        assertDoesNotThrow(()-> service.joinGame(testJoin, this.testAuthToken));
     }
 
     @Test
@@ -72,15 +71,15 @@ public class GameServiceTests {
         String testname = "testgame";
         int gameID = service.createGame(testname, this.testAuthToken);
         JoinGameRequest testJoin = new JoinGameRequest("WHITE", gameID);
-        assertDoesNotThrow(()-> {service.joinGame(testJoin, this.testAuthToken);});
+        assertDoesNotThrow(()-> service.joinGame(testJoin, this.testAuthToken));
 
-        assertThrows(ResponseException.class, ()-> {service.joinGame(testJoin, this.testAuthToken);}, "error: USER ALREADY TAKEN");
+        assertThrows(ResponseException.class, ()-> service.joinGame(testJoin, this.testAuthToken), "error: USER ALREADY TAKEN");
     }
     @Test
-    void joinNonexistantGame() throws ResponseException {
+    void joinNonexistantGame() {
         int gameID = 334223;
         JoinGameRequest testJoin = new JoinGameRequest(null, gameID);
-        assertThrows(ResponseException.class, ()-> {service.joinGame(testJoin, this.testAuthToken);}, "error: GAME DOES NOT EXIST");
+        assertThrows(ResponseException.class, ()-> service.joinGame(testJoin, this.testAuthToken), "error: GAME DOES NOT EXIST");
     }
 
 
