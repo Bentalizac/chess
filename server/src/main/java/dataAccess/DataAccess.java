@@ -2,6 +2,7 @@ package dataAccess;
 
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public interface DataAccess {
     void createUser(UserData user);
 
     void logout(AuthData data);
+
+    ArrayList<GameData> getGames();
 
 
 

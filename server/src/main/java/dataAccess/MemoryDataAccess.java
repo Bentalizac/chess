@@ -36,8 +36,6 @@ public class MemoryDataAccess implements DataAccess{
         return output;
     }
 
-
-
     public AuthData getUserByAuth(String authtoken) {
         return authData.get(authtoken);
     }
@@ -52,4 +50,13 @@ public class MemoryDataAccess implements DataAccess{
         gameData.clear();
     }
 
+    //              GAME ACCESS METHODS
+
+    public ArrayList<GameData> getGames() {
+        ArrayList<GameData> output = new ArrayList<>();
+        for (int key: gameData.keySet()) {
+            output.add(gameData.get(key));
+        }
+        return output;
+    }
 }

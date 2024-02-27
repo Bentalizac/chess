@@ -3,6 +3,7 @@ package service;
 import dataAccess.MemoryDataAccess;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.lang.reflect.Field;
@@ -17,9 +18,13 @@ public class GameService {
 
     public GameService() {dataAccess = new MemoryDataAccess();}
 
-    //private Boolean isAuthorized(String authToken) throws ResponseException {
-    //    String dbToken = dataAccess.
-    //}
+    private Boolean isAuthorized(String authToken) {
+        AuthData dbToken = dataAccess.getUserByAuth(authToken);
+        return dbToken != null && dbToken.authToken() != null;
+    }
 
+    public ArrayList<GameData> getGames() {
+        return dataAccess.getGames();
+    }
 
 }

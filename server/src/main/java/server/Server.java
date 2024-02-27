@@ -101,4 +101,12 @@ public class Server {
         }
     }
 
+
+    //              GAME METHODS
+
+    public Object listGames(Request req, Response res) {
+        return null;
+    }
+
+
 }
