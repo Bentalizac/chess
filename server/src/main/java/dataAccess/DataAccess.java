@@ -20,7 +20,7 @@ public interface DataAccess {
 
     AuthData getUserByAuth(String authtoken) throws ResponseException;
 
-    void createUser(UserData user);
+    void createUser(UserData user) throws ResponseException;
 
     void logout(AuthData data);
 
@@ -28,9 +28,9 @@ public interface DataAccess {
 
     int getNextID();
 
-    void createGame(GameData game);
+    void createGame(GameData game) throws ResponseException;
 
-    GameData getGame(int gameID);
+    GameData getGame(int gameID) throws ResponseException;
 
     void updateGame(GameData game);
 

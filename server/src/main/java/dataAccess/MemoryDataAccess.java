@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
+import exception.ResponseException;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
