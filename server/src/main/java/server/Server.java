@@ -83,7 +83,6 @@ public class Server {
 
     public Object login(Request req, Response res) {
         UserData user = new Gson().fromJson(req.body(), UserData.class);
-        System.out.println(user.username());
         AuthData authData;
         try {
             authData = userService.login(user.username(), user.password());

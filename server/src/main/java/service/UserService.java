@@ -14,8 +14,6 @@ public class UserService{
 
     private final MemoryDataAccess dataAccess;
 
-
-
     public UserService(MemoryDataAccess dataAccess){
         this.dataAccess = dataAccess;
     }
