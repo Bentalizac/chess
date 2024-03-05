@@ -75,7 +75,7 @@ public class Server {
         }
     }
 
-    public Object deleteAllData(Request req, Response res) throws ResponseException {
+    public Object deleteAllData(Request req, Response res) {
         userService.deleteAllData();
         res.status(200);
         return "";
