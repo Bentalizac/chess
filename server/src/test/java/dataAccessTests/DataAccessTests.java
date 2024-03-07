@@ -121,10 +121,16 @@ public class DataAccessTests {
     @Test
     void joinGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-
         var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
         dataAccess.createGame(testGame);
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
+    }
+
+    @Test
+    void joinGameBadId()  {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(1023655440, "JuanitaPablo", null, "testing", new ChessGame());
+        assertThrows(ResponseException.class, ()-> dataAccess.updateGame(testGame));
     }
 
     @Test
