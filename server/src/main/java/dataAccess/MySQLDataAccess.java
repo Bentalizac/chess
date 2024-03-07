@@ -227,8 +227,20 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public AuthData getUserByAuth(String authtoken)  {
-        return null;
+
+        String statement = "SELECT authData FROM authData WHERE authToken=?";
+        var authDatas = getAuthRecord(statement, authtoken);
+
+        if(authDatas == null) {
+            return null;
+        } else if (authDatas.isEmpty()) {
+            return null;
+        }
+        else{
+            return authDatas.getFirst();
+        }
     }
+
     @Override
     public void createUser(UserData user) throws ResponseException{
         String statement = "INSERT INTO userData (username, password, email, userData) VALUES (?, ?, ?, ?)";
@@ -238,7 +250,13 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public void logout(AuthData data) {
-
+        String statement = "DELETE FROM authData WHERE authToken=?";
+        try {
+            var id = executeUpdate(statement, data.authToken());
+        }
+        catch(ResponseException e) {
+            //ignore
+        }
     }
 
     @Override

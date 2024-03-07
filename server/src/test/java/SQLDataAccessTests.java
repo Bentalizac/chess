@@ -1,6 +1,7 @@
 import dataAccess.DataAccess;
 import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
+import model.AuthData;
 import model.UserData;
 
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,7 @@ public class SQLDataAccessTests {
         DataAccess dataAccess = getDataAccess();
         var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
         assertDoesNotThrow(()->dataAccess.login(testUser.username(), testUser.password()));
+
     }
 
     @Test
@@ -62,7 +64,16 @@ public class SQLDataAccessTests {
         assertThrows(ResponseException.class, ()->dataAccess.login(testUser.username(), testUser.password()));
     }
 
+    // There isn't a loginBadPassword because the DAO doesn't have the password checking logic
 
+    @Test
+    void logout() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
+        AuthData auth = dataAccess.login(testUser.username(),testUser.password());
+
+        assertDoesNotThrow(()->dataAccess.logout(auth));
+    }
 
 
 
