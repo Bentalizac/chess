@@ -46,8 +46,7 @@ public class MySQLDataAccess implements DataAccess {
               `username` varchar(50) NOT NULL,
               `authToken` varchar(100) NOT NULL,
               `authData` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              UNIQUE KEY `username_UNIQUE` (`username`)
+              PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             """,
 
@@ -55,9 +54,10 @@ public class MySQLDataAccess implements DataAccess {
             CREATE TABLE IF NOT EXISTS gameData (
               `id` int NOT NULL,
               `gameName` varchar(50) NOT NULL,
-              `whiteUsername` varchar(100) NOT NULL,
-              `blackUsername` varchar(100) NOT NULL,
+              `whiteUsername` varchar(100) DEFAULT NULL,
+              `blackUsername` varchar(100) DEFAULT NULL,
               `gameJSON` TEXT DEFAULT NULL,
+              `gameData` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             
@@ -140,6 +140,30 @@ public class MySQLDataAccess implements DataAccess {
         return result;
     }
 
+    private ArrayList<GameData> getGameRecord(String statement, Object... params) {
+        ArrayList<GameData> result = new ArrayList<>();
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)) {
+
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                }
+                try (var rs = ps.executeQuery()) {
+                    while(rs.next()) {
+                        result.add(resultToGame(rs));
+                    }
+                }
+            }
+        }
+        catch(SQLException e) {
+            return null;
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
 
 
     private void configureDataBase() throws ResponseException{
@@ -197,6 +221,19 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
+    private GameData resultToGame(ResultSet response){
+        if(response == null) {
+            return null;
+        }
+        try {
+            var json = response.getString("authData");
+            return new Gson().fromJson(json, GameData.class);
+        }
+        catch(SQLException ex) {
+            return null;
+        }
+    }
+
     public UserData getUser(String userName) {
         String statement = "SELECT userData FROM userData WHERE username= ? ";
         ArrayList<UserData> response = getUserRecord(statement, userName);
@@ -220,7 +257,7 @@ public class MySQLDataAccess implements DataAccess {
         AuthData auth = new AuthData(authToken, username);
         String statement = "INSERT INTO authData (username, authToken, authData) VALUES (?,?,?)";
         var json = new Gson().toJson(auth);
-        var id = executeUpdate(statement, auth.authToken(), auth.username(), json);
+        var id = executeUpdate(statement, auth.username(), auth.authToken(), json);
 
         return auth;
     }
@@ -263,24 +300,50 @@ public class MySQLDataAccess implements DataAccess {
     public ArrayList<GameData> getGames() {
         return null;
     }
-
+    private int nextGameId = 1;
     @Override
     public int getNextID() {
-        return 0;
+        return nextGameId;
     }
 
     @Override
-    public void createGame(GameData game) {
-
+    public void createGame(GameData game) throws ResponseException{
+        var json = new Gson().toJson(game);
+        var gameJson = new Gson().toJson(game.game());
+        String statement ="INSERT INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
+        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), json, gameJson);
+        this.nextGameId += 1;
     }
+
+
+    /*
+    `id` int NOT NULL,
+              `gameName` varchar(50) NOT NULL,
+              `whiteUsername` varchar(100) NOT NULL,
+              `blackUsername` varchar(100) NOT NULL,
+              `gameJSON` TEXT DEFAULT NULL,
+     */
 
     @Override
     public GameData getGame(int gameID) {
-        return null;
+        String statement = "SELECT FROM gameData WHERE id=?";
+        var gameDataResponse = getGameRecord(statement, gameID);
+
+        if(gameDataResponse == null) {
+            return null;
+        } else if (gameDataResponse.isEmpty()) {
+            return null;
+        }
+        else{
+            return gameDataResponse.getFirst();
+        }
     }
 
     @Override
-    public void updateGame(GameData game) {
-
+    public void updateGame(GameData game) throws ResponseException{
+        var json = new Gson().toJson(game);
+        var gameJson = new Gson().toJson(game.game());
+        String statement ="UPDATE INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
+        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), json, gameJson);
     }
 }

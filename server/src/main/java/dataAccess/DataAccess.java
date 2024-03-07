@@ -32,7 +32,7 @@ public interface DataAccess {
 
     GameData getGame(int gameID) throws ResponseException;
 
-    void updateGame(GameData game);
+    void updateGame(GameData game) throws ResponseException;
 
 
 

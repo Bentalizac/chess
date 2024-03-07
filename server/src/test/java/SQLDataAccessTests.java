@@ -1,7 +1,9 @@
+import chess.ChessGame;
 import dataAccess.DataAccess;
 import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import org.junit.jupiter.api.Test;
@@ -75,6 +77,13 @@ public class SQLDataAccessTests {
         assertDoesNotThrow(()->dataAccess.logout(auth));
     }
 
+
+    @Test
+    void createGame() throws  ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(100, null, null, "testing", new ChessGame());
+        assertDoesNotThrow(()-> dataAccess.createGame(testGame));
+    }
 
 
 
