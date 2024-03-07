@@ -15,6 +15,13 @@ public class SQLDataAccessTests {
     private DataAccess getDataAccess() throws ResponseException {
         return new MySQLDataAccess();
     }
+
+    private void setup() throws ResponseException{
+        DataAccess dataAccess = getDataAccess();
+        dataAccess.clearData();
+
+    }
+
     @Test
     void addUser() throws ResponseException{
         DataAccess dataAccess = getDataAccess();
@@ -90,6 +97,25 @@ public class SQLDataAccessTests {
         DataAccess dataAccess = getDataAccess();
         var testGame = new GameData(100, null, null, "testing", new ChessGame());
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
+    }
+
+    @Test
+    void joinGame() throws  ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        createGame();
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
+
+        GameData result = dataAccess.getGame(testGame.gameID());
+
+        System.out.println("Space to debug");
+    }
+
+    @Test
+    void getGame() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        assertEquals(dataAccess.getGame(testGame.gameID()).game(), testGame.game());
     }
 
 

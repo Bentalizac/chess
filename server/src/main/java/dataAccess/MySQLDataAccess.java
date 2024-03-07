@@ -226,7 +226,7 @@ public class MySQLDataAccess implements DataAccess {
             return null;
         }
         try {
-            var json = response.getString("authData");
+            var json = response.getString("gameData");
             return new Gson().fromJson(json, GameData.class);
         }
         catch(SQLException ex) {
@@ -298,7 +298,9 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public ArrayList<GameData> getGames() {
-        return null;
+        String statement = "SELECT * FROM gameData";
+
+        return getGameRecord(statement);
     }
     private int nextGameId = 1;
     @Override
@@ -311,22 +313,14 @@ public class MySQLDataAccess implements DataAccess {
         var json = new Gson().toJson(game);
         var gameJson = new Gson().toJson(game.game());
         String statement ="INSERT INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
-        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), json, gameJson);
+        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), gameJson, json);
         this.nextGameId += 1;
     }
 
 
-    /*
-    `id` int NOT NULL,
-              `gameName` varchar(50) NOT NULL,
-              `whiteUsername` varchar(100) NOT NULL,
-              `blackUsername` varchar(100) NOT NULL,
-              `gameJSON` TEXT DEFAULT NULL,
-     */
-
     @Override
     public GameData getGame(int gameID) {
-        String statement = "SELECT FROM gameData WHERE id=?";
+        String statement = "SELECT gameData FROM gameData WHERE id=?";
         var gameDataResponse = getGameRecord(statement, gameID);
 
         if(gameDataResponse == null) {
