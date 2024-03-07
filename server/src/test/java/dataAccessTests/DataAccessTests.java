@@ -85,10 +85,6 @@ public class DataAccessTests {
         assertDoesNotThrow(()->dataAccess.login(testUser.username(), testUser.password()));
     }
 
-
-
-    // There isn't a loginBadPassword because the DAO doesn't have the password checking logic
-
     @Test
     void logout() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
@@ -106,18 +102,28 @@ public class DataAccessTests {
         assertDoesNotThrow(()-> dataAccess.createGame(testGame));
     }
 
+
+
     @Test
-    void watchGame()  {
+    void watchGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
         var testGame = new GameData(100, null, null, "testing", new ChessGame());
+        dataAccess.createGame(testGame);
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
     }
 
     @Test
-    void joinGame()  {
+    void watchGameBadId()  {
         DataAccess dataAccess = getDataAccess();
-        createGame();
+        var testGame = new GameData(1023434240, null, null, "testing", new ChessGame());
+        assertThrows(ResponseException.class, ()-> dataAccess.updateGame(testGame));
+    }
+    @Test
+    void joinGame() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+
         var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        dataAccess.createGame(testGame);
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
     }
 
@@ -125,10 +131,16 @@ public class DataAccessTests {
     void getGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
         var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
-
         dataAccess.createGame(testGame);
-
         assertEquals(dataAccess.getGame(testGame.gameID()).game(), testGame.game());
+    }
+
+    @Test
+    void getBadGame() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        dataAccess.createGame(testGame);
+        assertNull(dataAccess.getGame(23445));
     }
 
 

@@ -5,12 +5,10 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.ArrayList;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -70,12 +68,16 @@ public class MySQLDataAccess implements DataAccess {
             try(var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param instanceof UserData p) ps.setString(i + 1, p.toString());
-                    else if (param instanceof AuthData p) ps.setString(i + 1, p.toString());
-                    else if (param instanceof GameData p) ps.setString(i + 1, p.toString());
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case UserData p -> ps.setString(i + 1, p.toString());
+                        case AuthData p -> ps.setString(i + 1, p.toString());
+                        case GameData p -> ps.setString(i + 1, p.toString());
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
                 }
                 ps.executeUpdate();
                 var rs = ps.getGeneratedKeys();
@@ -237,6 +239,7 @@ public class MySQLDataAccess implements DataAccess {
     public UserData getUser(String userName) {
         String statement = "SELECT userData FROM userData WHERE username= ? ";
         ArrayList<UserData> response = getUserRecord(statement, userName);
+        assert response != null;
         if(!response.isEmpty()){
             return response.getFirst();
         }
@@ -257,7 +260,7 @@ public class MySQLDataAccess implements DataAccess {
         AuthData auth = new AuthData(authToken, username);
         String statement = "INSERT INTO authData (username, authToken, authData) VALUES (?,?,?)";
         var json = new Gson().toJson(auth);
-        var id = executeUpdate(statement, auth.username(), auth.authToken(), json);
+        executeUpdate(statement, auth.username(), auth.authToken(), json);
         return auth;
     }
 
@@ -281,14 +284,14 @@ public class MySQLDataAccess implements DataAccess {
     public void createUser(UserData user) throws ResponseException{
         String statement = "INSERT INTO userData (username, password, email, userData) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(user);
-        var id = executeUpdate(statement, user.username(), user.password(), user.email(), json);
+        executeUpdate(statement, user.username(), user.password(), user.email(), json);
     }
 
     @Override
     public void logout(AuthData data) {
         String statement = "DELETE FROM authData WHERE authToken=?";
         try {
-            var id = executeUpdate(statement, data.authToken());
+            executeUpdate(statement, data.authToken());
         }
         catch(ResponseException e) {
             //ignore
@@ -312,7 +315,7 @@ public class MySQLDataAccess implements DataAccess {
         var json = new Gson().toJson(game);
         var gameJson = new Gson().toJson(game.game());
         String statement ="INSERT INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
-        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), gameJson, json);
+        executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), gameJson, json);
         this.nextGameId += 1;
     }
 
@@ -332,12 +335,22 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
+    private boolean gameExists(GameData game) throws ResponseException {
+        //String statement = "SELECT * FROM gameData WHERE id =?";
+        var response = getGame(game.gameID());
+        return response != null;
+
+    }
     @Override
     public void updateGame(GameData game) throws ResponseException{
         var json = new Gson().toJson(game);
-        var gameJson = new Gson().toJson(game.game());
-        //String statement ="UPDATE INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
+
+        if(!gameExists(game)) {
+            throw new ResponseException(400, "error: GAME DOES NOT EXIST");
+        }
+
         String statement = "UPDATE gameData SET whiteUsername = ? , blackUsername = ?, gameData = ? WHERE id =?";
         var id = executeUpdate(statement, game.whiteUsername(),game.blackUsername(), json, game.gameID());
+        System.out.println(id);
     }
 }
