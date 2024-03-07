@@ -1,3 +1,5 @@
+package dataAccessTests;
+
 import chess.ChessGame;
 import dataAccess.DataAccess;
 import dataAccess.MySQLDataAccess;
@@ -11,29 +13,44 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class dataAccessTests {
+public class DataAccessTests {
 
-    private DataAccess getDataAccess() throws ResponseException {
+    private DataAccess getDataAccess() {
         return new MySQLDataAccess();
     }
 
-    private void setup() throws ResponseException{
-        DataAccess dataAccess = getDataAccess();
-        dataAccess.clearData();
-
-    }
-
     @BeforeEach
-    void clearAll()throws ResponseException {
+    void clearAll() {
         DataAccess dataAccess = getDataAccess();
         assertDoesNotThrow(dataAccess::clearData);
     }
 
     @Test
-    void addUser() throws ResponseException{
+    void addUser() {
         DataAccess dataAccess = getDataAccess();
         var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
         assertDoesNotThrow(()->dataAccess.createUser(testUser));
+    }
+
+    @Test
+    void addUserNoUsername() {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData(null, "password", "yee@haw.com");
+        assertThrows(ResponseException.class, ()->dataAccess.createUser(testUser));
+    }
+
+    @Test
+    void addUserNoPassword() {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanitaPablo", null, "yee@haw.com");
+        assertThrows(ResponseException.class, ()->dataAccess.createUser(testUser));
+    }
+
+    @Test
+    void addUserNoEmail() {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanitaPablo", "password", null);
+        assertThrows(ResponseException.class, ()->dataAccess.createUser(testUser));
     }
 
     @Test
@@ -62,21 +79,13 @@ public class dataAccessTests {
 
 
     @Test
-    void login() throws ResponseException {
+    void login()  {
         DataAccess dataAccess = getDataAccess();
         var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
         assertDoesNotThrow(()->dataAccess.login(testUser.username(), testUser.password()));
     }
 
-    /*
-    @Test
-    void loginBadUser() throws ResponseException {
-        DataAccess dataAccess = getDataAccess();
-        var badUser = new UserData("Bobby Tables", "password", "yee@haw.com");
-        assertNull(dataAccess.login(badUser.username(), badUser.password()));
-    }
 
-     */
 
     // There isn't a loginBadPassword because the DAO doesn't have the password checking logic
 
@@ -91,29 +100,25 @@ public class dataAccessTests {
 
 
     @Test
-    void createGame() throws  ResponseException {
+    void createGame() {
         DataAccess dataAccess = getDataAccess();
         var testGame = new GameData(100, null, null, "testing", new ChessGame());
         assertDoesNotThrow(()-> dataAccess.createGame(testGame));
     }
 
     @Test
-    void watchGame() throws  ResponseException {
+    void watchGame()  {
         DataAccess dataAccess = getDataAccess();
         var testGame = new GameData(100, null, null, "testing", new ChessGame());
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
     }
 
     @Test
-    void joinGame() throws  ResponseException {
+    void joinGame()  {
         DataAccess dataAccess = getDataAccess();
         createGame();
         var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
-
-        GameData result = dataAccess.getGame(testGame.gameID());
-
-        System.out.println("Space to debug");
     }
 
     @Test
