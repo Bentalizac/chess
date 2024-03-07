@@ -102,7 +102,12 @@ public class DataAccessTests {
         assertDoesNotThrow(()-> dataAccess.createGame(testGame));
     }
 
-
+    @Test
+    void createGameNoName() {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(100, null, null, null, new ChessGame());
+        assertThrows(ResponseException.class,()-> dataAccess.createGame(testGame));
+    }
 
     @Test
     void watchGame() throws ResponseException {
