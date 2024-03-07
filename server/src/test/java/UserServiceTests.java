@@ -11,9 +11,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
-    //static MemoryDataAccess dataAccess = new MemoryDataAccess();
+    static MemoryDataAccess dataAccess = new MemoryDataAccess();
 
-    static MySQLDataAccess dataAccess = new MySQLDataAccess();
+    //static MySQLDataAccess dataAccess = new MySQLDataAccess();
     static final UserService service = new UserService(dataAccess);
 
     @BeforeEach

@@ -6,6 +6,7 @@ import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -55,12 +56,17 @@ public class UserService{
         }
     }
 
+    private boolean passwordMatch(String raw, String hash) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.matches(raw, hash);
+    }
+
     public AuthData login(String username, String password) throws ResponseException{
         UserData user = dataAccess.getUser(username);
         if(user == null) {
             throw new ResponseException(401, "error: USER NOT FOUND");
         }
-        else if (!Objects.equals(user.password(), password)) {
+        else if (!passwordMatch(password, user.password())) {
             throw new ResponseException(401, "error: INCORRECT PASSWORD");
         }
         return dataAccess.login(username, this.generatePassword());

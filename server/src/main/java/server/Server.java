@@ -8,6 +8,7 @@ import model.JoinGameRequest;
 import model.UserData;
 import com.google.gson.Gson;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -61,8 +62,20 @@ public class Server {
         return "{ \"message\": \"" + ex.getMessage() + "\" }";
     } //Generates the JSON string that needs to be passed back from an exception
 
+    private String encryptPassword(String rawPassword) {
+        if(rawPassword == null) {
+            return null;
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(rawPassword);
+    }
+
+    private UserData encryptPassword(UserData input){
+        return new UserData(input.username(), encryptPassword(input.password()), input.email());
+    }
+
     public Object addUser(Request req, Response res) {
-        UserData user = new Gson().fromJson(req.body(), UserData.class);
+        UserData user = encryptPassword(new Gson().fromJson(req.body(), UserData.class));
         AuthData userAuth;
         try {
             userAuth = userService.createUser(user);

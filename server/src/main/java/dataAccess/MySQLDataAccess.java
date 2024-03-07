@@ -128,10 +128,7 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
-    private String encryptPassword(String rawPassword) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(rawPassword);
-    }
+
 
     public void clearData() {
         try {
@@ -179,6 +176,9 @@ public class MySQLDataAccess implements DataAccess {
 
     @Override
     public AuthData login(String username, String authToken) {
+
+
+
         return null;
     }
 
@@ -190,7 +190,7 @@ public class MySQLDataAccess implements DataAccess {
     public void createUser(UserData user) throws ResponseException{
         String statement = "INSERT INTO userData (username, password, email, userData) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(user);
-        var id = executeUpdate(statement, user.username(), encryptPassword(user.password()), user.email(), json);
+        var id = executeUpdate(statement, user.username(), user.password(), user.email(), json);
     }
 
     @Override
