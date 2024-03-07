@@ -29,6 +29,20 @@ public class SQLDataAccessTests {
         assertDoesNotThrow(()->dataAccess.createUser(testUser));
     }
 
+    @Test
+    void getUser() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanPablo", "password", "yee@haw.com");
+        var resultUser = dataAccess.getUser(testUser.username());
+        System.out.println(resultUser.toString());
+    }
+
+    @Test
+    void clearAll()throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        assertDoesNotThrow(dataAccess::clearData);
+    }
+
 
 
 

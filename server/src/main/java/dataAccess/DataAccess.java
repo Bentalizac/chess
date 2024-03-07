@@ -14,7 +14,7 @@ public interface DataAccess {
 
     UserData getUser(String userName) throws ResponseException;
 
-    ArrayList<UserData> getAllUsers();
+    ArrayList<UserData> getAllUsers() throws ResponseException;
 
     AuthData login(String username, String authToken);
 

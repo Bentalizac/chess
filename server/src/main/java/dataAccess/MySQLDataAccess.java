@@ -5,7 +5,10 @@ import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.sql.Array;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -27,8 +30,7 @@ public class MySQLDataAccess implements DataAccess {
               `email` varchar(100) NOT NULL,
               `userData` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`),
-              UNIQUE KEY `username_UNIQUE` (`username`),
-              UNIQUE KEY `email_UNIQUE` (`email`)
+              UNIQUE KEY `username_UNIQUE` (`username`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
             
             """,
@@ -57,7 +59,7 @@ public class MySQLDataAccess implements DataAccess {
             """
     };
 
-    private int executeUpdate(String statement, Object... params) throws ResponseException {
+    private int executeUpdate(String statement, Object... params) throws ResponseException { // Can be used for C, U, and D, not R
 
         try(var conn = DatabaseManager.getConnection()){
             try(var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -83,6 +85,27 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
+    private ResultSet getRecord(String statement, Object... params) throws ResponseException {
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)) {
+
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                }
+                try (var rs = ps.executeQuery()) {
+
+                        return rs;
+
+                }
+            }
+        }
+        catch(SQLException e) {
+            throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
     private void configureDataBase() throws ResponseException{
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
@@ -96,24 +119,52 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
-
-    private String encryptPassword(String rawPassword) { // TODO actually encrypt the password
-        return rawPassword;
+    private String encryptPassword(String rawPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        return encoder.encode(rawPassword);
     }
 
     public void clearData() throws ResponseException {
-        String statement = "TRUNCATE TABLE userData, authData, gameData";
+        String statement = "TRUNCATE TABLE userData";
+        executeUpdate(statement);
+        statement = "TRUNCATE TABLE authData";
+        executeUpdate(statement);
+        statement = "TRUNCATE TABLE gameData";
         executeUpdate(statement);
     }
 
-    @Override
+    private UserData resultToUser(ResultSet response){
+        if(response == null) {
+            return null;
+        }
+        try {
+            var json = response.getString("userData");
+            return new Gson().fromJson(json, UserData.class);
+        }
+        catch(SQLException ex) {
+            return null;
+        }
+    }
     public UserData getUser(String userName) throws ResponseException {
-        return null;
+        String statement = "SELECT userData FROM userData WHERE username= ? ";
+        ResultSet response = getRecord(statement, userName);
+        return resultToUser(response);
     }
 
     @Override
-    public ArrayList<UserData> getAllUsers() {
-        return null;
+    public ArrayList<UserData> getAllUsers () throws ResponseException{
+        ArrayList<UserData> result = new ArrayList<>();
+        String statement = "SELECT userData FROM userData";
+        ResultSet response = getRecord(statement);
+        try {
+            while (response.next()) {
+                result.add(resultToUser(response));
+            }
+        }
+        catch(Exception e) {
+            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return result;
     }
 
     @Override
