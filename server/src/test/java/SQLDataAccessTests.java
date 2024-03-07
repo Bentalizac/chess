@@ -25,7 +25,7 @@ public class SQLDataAccessTests {
     @Test
     void addUser() throws ResponseException{
         DataAccess dataAccess = getDataAccess();
-        var testUser = new UserData("JuanPablo", "password", "yee@haw.com");
+        var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
         assertDoesNotThrow(()->dataAccess.createUser(testUser));
     }
 
@@ -35,6 +35,14 @@ public class SQLDataAccessTests {
         var testUser = new UserData("JuanPablo", "password", "yee@haw.com");
         var resultUser = dataAccess.getUser(testUser.username());
         System.out.println(resultUser.toString());
+    }
+
+    @Test
+    void getUsers() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        assertDoesNotThrow(dataAccess::getAllUsers);
+        ArrayList<UserData> result = dataAccess.getAllUsers();
+        System.out.println(result);
     }
 
     @Test

@@ -85,7 +85,8 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
-    private ResultSet getRecord(String statement, Object... params) throws ResponseException {
+    private ArrayList<UserData> getUserRecord(String statement, Object... params) throws ResponseException {
+        ArrayList<UserData> result = new ArrayList<>();
         try(var conn = DatabaseManager.getConnection()){
             try(var ps = conn.prepareStatement(statement)) {
 
@@ -95,15 +96,16 @@ public class MySQLDataAccess implements DataAccess {
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
                 }
                 try (var rs = ps.executeQuery()) {
-
-                        return rs;
-
+                    while(rs.next()) {
+                        result.add(resultToUser(rs));
+                    }
                 }
             }
         }
         catch(SQLException e) {
             throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
+        return result;
     }
 
     private void configureDataBase() throws ResponseException{
@@ -147,25 +149,21 @@ public class MySQLDataAccess implements DataAccess {
     }
     public UserData getUser(String userName) throws ResponseException {
         String statement = "SELECT userData FROM userData WHERE username= ? ";
-        ResultSet response = getRecord(statement, userName);
-        return resultToUser(response);
+        ArrayList<UserData> response = getUserRecord(statement, userName);
+        if(!response.isEmpty()){
+            return response.getFirst();
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
-    public ArrayList<UserData> getAllUsers () throws ResponseException{
-        ArrayList<UserData> result = new ArrayList<>();
+    public ArrayList<UserData> getAllUsers () throws ResponseException {
         String statement = "SELECT userData FROM userData";
-        ResultSet response = getRecord(statement);
-        try {
-            while (response.next()) {
-                result.add(resultToUser(response));
-            }
-        }
-        catch(Exception e) {
-            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
-        }
-        return result;
+        return getUserRecord(statement);
     }
+
 
     @Override
     public AuthData login(String username, String authToken) {
