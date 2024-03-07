@@ -32,9 +32,16 @@ public class SQLDataAccessTests {
     @Test
     void getUser() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-        var testUser = new UserData("JuanPablo", "password", "yee@haw.com");
+        var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
         var resultUser = dataAccess.getUser(testUser.username());
         System.out.println(resultUser.toString());
+    }
+
+    @Test
+    void getBadUser() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        assertEquals(null, dataAccess.getUser("FakityFakerson"));
+        //assertThrows(ResponseException.class, ()->{dataAccess.getUser("FakityFakerson");});
     }
 
     @Test
