@@ -1,6 +1,7 @@
 package server;
 
 import dataAccess.MemoryDataAccess;
+import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -20,7 +21,8 @@ public class Server {
     private final GameService gameService;
 
     public Server() {
-        var dataAccess = new MemoryDataAccess();
+        //var dataAccess = new MemoryDataAccess();
+        var dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
 

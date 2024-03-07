@@ -115,6 +115,33 @@ public class MySQLDataAccess implements DataAccess {
         return result;
     }
 
+    private ArrayList<AuthData> getAuthRecord(String statement, Object... params) {
+        ArrayList<AuthData> result = new ArrayList<>();
+        try(var conn = DatabaseManager.getConnection()){
+            try(var ps = conn.prepareStatement(statement)) {
+
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                }
+                try (var rs = ps.executeQuery()) {
+                    while(rs.next()) {
+                        result.add(resultToAuth(rs));
+                    }
+                }
+            }
+        }
+        catch(SQLException e) {
+            return null;
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+
+
     private void configureDataBase() throws ResponseException{
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
@@ -156,6 +183,20 @@ public class MySQLDataAccess implements DataAccess {
             return null;
         }
     }
+
+    private AuthData resultToAuth(ResultSet response){
+        if(response == null) {
+            return null;
+        }
+        try {
+            var json = response.getString("authData");
+            return new Gson().fromJson(json, AuthData.class);
+        }
+        catch(SQLException ex) {
+            return null;
+        }
+    }
+
     public UserData getUser(String userName) {
         String statement = "SELECT userData FROM userData WHERE username= ? ";
         ArrayList<UserData> response = getUserRecord(statement, userName);
@@ -175,15 +216,17 @@ public class MySQLDataAccess implements DataAccess {
 
 
     @Override
-    public AuthData login(String username, String authToken) {
+    public AuthData login(String username, String authToken) throws ResponseException{
+        AuthData auth = new AuthData(authToken, username);
+        String statement = "INSERT INTO authData (username, authToken, authData) VALUES (?,?,?)";
+        var json = new Gson().toJson(auth);
+        var id = executeUpdate(statement, auth.authToken(), auth.username(), json);
 
-
-
-        return null;
+        return auth;
     }
 
     @Override
-    public AuthData getUserByAuth(String authtoken) throws ResponseException {
+    public AuthData getUserByAuth(String authtoken)  {
         return null;
     }
     @Override

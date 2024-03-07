@@ -1,6 +1,8 @@
 package service;
 
+import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -12,14 +14,23 @@ import java.util.ArrayList;
 public class GameService {
 
     // This class touches nothing in the ChessGame game field of the gameData record class. That may need to be changed later
-    private final MemoryDataAccess dataAccess;
+    private final DataAccess dataAccess;
 
     public GameService(MemoryDataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
 
+    public GameService(MySQLDataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+
+
     private AuthData isAuthorized(String authToken) {
-        return dataAccess.getUserByAuth(authToken);
+        try {
+            return dataAccess.getUserByAuth(authToken);
+        } catch (ResponseException e) {
+            return null;
+        }
     }
 
     private GameData buildNewGame(String gameName) { // Builds blank GameData records
