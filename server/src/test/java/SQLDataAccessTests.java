@@ -48,6 +48,25 @@ public class SQLDataAccessTests {
         assertDoesNotThrow(dataAccess::clearData);
     }
 
+    @Test
+    void login() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanitaPablo", "password", "yee@haw.com");
+        assertDoesNotThrow(()->dataAccess.login(testUser.username(), testUser.password()));
+    }
+
+    @Test
+    void loginBadUser() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testUser = new UserData("JuanitoPabloy", "password", "yee@haw.com");
+        assertThrows(ResponseException.class, ()->dataAccess.login(testUser.username(), testUser.password()));
+    }
+
+
+
+
+
+
 
 
 
