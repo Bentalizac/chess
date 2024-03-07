@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SQLDataAccessTests {
+public class dataAccessTests {
 
     private DataAccess getDataAccess() throws ResponseException {
         return new MySQLDataAccess();
