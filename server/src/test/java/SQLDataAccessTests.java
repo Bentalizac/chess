@@ -85,6 +85,13 @@ public class SQLDataAccessTests {
         assertDoesNotThrow(()-> dataAccess.createGame(testGame));
     }
 
+    @Test
+    void watchGame() throws  ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var testGame = new GameData(100, null, null, "testing", new ChessGame());
+        assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
+    }
+
 
 
 

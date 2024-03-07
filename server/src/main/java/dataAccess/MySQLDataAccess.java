@@ -343,7 +343,8 @@ public class MySQLDataAccess implements DataAccess {
     public void updateGame(GameData game) throws ResponseException{
         var json = new Gson().toJson(game);
         var gameJson = new Gson().toJson(game.game());
-        String statement ="UPDATE INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
-        var id = executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), json, gameJson);
+        //String statement ="UPDATE INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
+        String statement = "UPDATE gameData SET whiteUsername = ? , blackUsername = ?, gameData = ? WHERE id =?";
+        var id = executeUpdate(statement, game.whiteUsername(),game.blackUsername(), json, game.gameID());
     }
 }
