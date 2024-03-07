@@ -258,7 +258,6 @@ public class MySQLDataAccess implements DataAccess {
         String statement = "INSERT INTO authData (username, authToken, authData) VALUES (?,?,?)";
         var json = new Gson().toJson(auth);
         var id = executeUpdate(statement, auth.username(), auth.authToken(), json);
-
         return auth;
     }
 

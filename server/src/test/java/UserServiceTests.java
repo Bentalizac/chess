@@ -43,7 +43,6 @@ public class UserServiceTests {
         AuthData userAuth = service.createUser(user);
         service.logout(userAuth.authToken());
         assertDoesNotThrow(()-> service.login(user.username(), user.password()));
-
     }
 
     @Test
