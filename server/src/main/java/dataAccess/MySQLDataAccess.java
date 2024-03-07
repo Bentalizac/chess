@@ -147,7 +147,7 @@ public class MySQLDataAccess implements DataAccess {
             return null;
         }
     }
-    public UserData getUser(String userName) throws ResponseException {
+    public UserData getUser(String userName) throws ResponseException { // This works now
         String statement = "SELECT userData FROM userData WHERE username= ? ";
         ArrayList<UserData> response = getUserRecord(statement, userName);
         if(!response.isEmpty()){
