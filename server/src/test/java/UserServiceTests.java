@@ -1,4 +1,5 @@
 import dataAccess.MemoryDataAccess;
+import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
-    static MemoryDataAccess dataAccess = new MemoryDataAccess();
+    //static MemoryDataAccess dataAccess = new MemoryDataAccess();
+
+    static MySQLDataAccess dataAccess = new MySQLDataAccess();
     static final UserService service = new UserService(dataAccess);
 
     @BeforeEach

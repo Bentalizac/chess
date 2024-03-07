@@ -1,6 +1,8 @@
 package service;
 
+import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
+import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
@@ -12,12 +14,14 @@ import java.util.UUID;
 
 public class UserService{
 
-    private final MemoryDataAccess dataAccess;
+    //private final MySQLDataAccess dataAccess;
+    private final DataAccess dataAccess;
 
     public UserService(MemoryDataAccess dataAccess){
         this.dataAccess = dataAccess;
     }
 
+    public UserService(MySQLDataAccess dataAccess) { this.dataAccess = dataAccess;}
     private String generatePassword() {
         return UUID.randomUUID().toString();
     }
@@ -36,11 +40,19 @@ public class UserService{
         else throw new ResponseException(403, "error: USER ALREADY EXISTS");
     }
     public ArrayList<UserData> getUsers() {
-        return dataAccess.getAllUsers();
+        try {
+            return dataAccess.getAllUsers();
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
     public void deleteAllData() {
         var thisIsToHaveUsageOfGetUsers = this.getUsers();
-        this.dataAccess.clearData();
+        try {
+            this.dataAccess.clearData();
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AuthData login(String username, String password) throws ResponseException{

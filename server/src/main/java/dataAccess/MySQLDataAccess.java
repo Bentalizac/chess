@@ -18,8 +18,13 @@ import static java.sql.Types.NULL;
 
 public class MySQLDataAccess implements DataAccess {
 
-    public MySQLDataAccess () throws ResponseException {
-        configureDataBase();
+    public MySQLDataAccess ()  {
+        try {
+            configureDataBase();
+        }
+        catch(Exception e){
+            //ignore
+        }
     }
     private final String[] createStatements = {
             """
@@ -85,7 +90,7 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
-    private ArrayList<UserData> getUserRecord(String statement, Object... params) throws ResponseException {
+    private ArrayList<UserData> getUserRecord(String statement, Object... params) {
         ArrayList<UserData> result = new ArrayList<>();
         try(var conn = DatabaseManager.getConnection()){
             try(var ps = conn.prepareStatement(statement)) {
@@ -103,7 +108,9 @@ public class MySQLDataAccess implements DataAccess {
             }
         }
         catch(SQLException e) {
-            throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            return null;
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
@@ -126,13 +133,18 @@ public class MySQLDataAccess implements DataAccess {
         return encoder.encode(rawPassword);
     }
 
-    public void clearData() throws ResponseException {
-        String statement = "TRUNCATE TABLE userData";
-        executeUpdate(statement);
-        statement = "TRUNCATE TABLE authData";
-        executeUpdate(statement);
-        statement = "TRUNCATE TABLE gameData";
-        executeUpdate(statement);
+    public void clearData() {
+        try {
+            String statement = "TRUNCATE TABLE userData";
+            executeUpdate(statement);
+            statement = "TRUNCATE TABLE authData";
+            executeUpdate(statement);
+            statement = "TRUNCATE TABLE gameData";
+            executeUpdate(statement);
+        }
+        catch(Exception e){
+            //ignore
+        }
     }
 
     private UserData resultToUser(ResultSet response){
@@ -147,7 +159,7 @@ public class MySQLDataAccess implements DataAccess {
             return null;
         }
     }
-    public UserData getUser(String userName) throws ResponseException {
+    public UserData getUser(String userName) {
         String statement = "SELECT userData FROM userData WHERE username= ? ";
         ArrayList<UserData> response = getUserRecord(statement, userName);
         if(!response.isEmpty()){
@@ -159,7 +171,7 @@ public class MySQLDataAccess implements DataAccess {
     }
 
     @Override
-    public ArrayList<UserData> getAllUsers () throws ResponseException {
+    public ArrayList<UserData> getAllUsers () {
         String statement = "SELECT userData FROM userData";
         return getUserRecord(statement);
     }
