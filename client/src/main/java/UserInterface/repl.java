@@ -3,6 +3,7 @@ import model.AuthData;
 import server.ServerFacade;
 import ui.EscapeSequences;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -11,9 +12,9 @@ public class repl {
 
     AuthData authData = null;
     EscapeSequences ui = new EscapeSequences();
+    ServerFacade serverFacade = new ServerFacade(8080);
 
     public void runREPL(String[] args) {
-        ServerFacade serverFacade = new ServerFacade(8080);
         Scanner scanner = new Scanner(System.in);
         System.out.print(EscapeSequences.WHITE_KING + " Welcome to this 240 Chess nonsense " + EscapeSequences.BLACK_KING + "\n");
         while (true) {
@@ -37,6 +38,30 @@ public class repl {
         if (Objects.equals(command, "help")) {
             return helpCommand();
         }
+
+        else if (command.equals("register")) {
+            System.out.print("Registering user with username " + body[1] + "\n");
+        }
+        else if (command.equals("login")) {
+            System.out.print("Logging in user: " + body[1]+ "\n");
+        }
+        else if (command.equals("list")) {
+            System.out.print("Fetching all games"+ "\n");
+        }
+        else if (command.equals("join")) {
+            System.out.print("Joining game " + body[1] + " with the following information:" + Arrays.toString(body)+ "\n");
+        }
+        else if (command.equals("observe")) {
+            System.out.print("Spectating game " + body[1]+ "\n");
+        }
+        else if (command.equals("logout")) {
+            System.out.print("Logging out"+ "\n");
+            this.authData = null;
+        }
+        else{
+            System.out.print("Command not recognized, type HELP to view valid commands \n");
+        }
+
         return null;
     }
 
