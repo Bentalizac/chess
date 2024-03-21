@@ -1,5 +1,6 @@
 package UserInterface;
 import model.AuthData;
+import model.UserData;
 import server.ServerFacade;
 import ui.EscapeSequences;
 
@@ -12,14 +13,14 @@ public class repl {
 
     AuthData authData = null;
     EscapeSequences ui = new EscapeSequences();
-    ServerFacade serverFacade = new ServerFacade(8080);
+    ServerFacade serverFacade = new ServerFacade("HTTP://localhost:8080");
 
     public void runREPL(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print(EscapeSequences.WHITE_KING + " Welcome to this 240 Chess nonsense " + EscapeSequences.BLACK_KING + "\n");
+        System.out.print(EscapeSequences.WHITE_KING + " Welcome to this 240 Chess Nonsense " + EscapeSequences.BLACK_KING + "\n");
         while (true) {
             // Prompt user for input
-            System.out.print("Type Help to get started: ");
+            System.out.print("\nType Help to get started: ");
             String userInput = scanner.nextLine();
             String response = parseInput(userInput);
             if (Objects.equals(response, "quit")) {
@@ -35,34 +36,34 @@ public class repl {
         if (command.equals("quit")) {
             return "quit";
         }
-        if (Objects.equals(command, "help")) {
-            return helpCommand();
-        }
+        switch (command) {
+            case "help" -> {
+                return helpCommand();
+            }
+            case "register" -> {
+                return this.register(body);
+            }
+            case "login" -> {
 
-        else if (command.equals("register")) {
-            System.out.print("Registering user with username " + body[1] + "\n");
+                return this.login(body);
+            }
+            case "list" -> {
+                return ("Fetching all games" + "\n");
+            }
+            case "join" -> {
+                return ("Joining game " + body[1] + " with the following information:" + Arrays.toString(body) + "\n");
+            }
+            case "observe" -> {
+                return ("Spectating game " + body[1] + "\n");
+            }
+            case "logout" -> {
+                this.authData = null;
+                return ("Logging out" + "\n");
+            }
+            default -> {
+                return ("Command not recognized, type HELP to view valid commands \n");
+            }
         }
-        else if (command.equals("login")) {
-            System.out.print("Logging in user: " + body[1]+ "\n");
-        }
-        else if (command.equals("list")) {
-            System.out.print("Fetching all games"+ "\n");
-        }
-        else if (command.equals("join")) {
-            System.out.print("Joining game " + body[1] + " with the following information:" + Arrays.toString(body)+ "\n");
-        }
-        else if (command.equals("observe")) {
-            System.out.print("Spectating game " + body[1]+ "\n");
-        }
-        else if (command.equals("logout")) {
-            System.out.print("Logging out"+ "\n");
-            this.authData = null;
-        }
-        else{
-            System.out.print("Command not recognized, type HELP to view valid commands \n");
-        }
-
-        return null;
     }
 
     private String helpCommand() { // Returns the help string
@@ -86,6 +87,32 @@ public class repl {
                         Help | Return to this ✨beautifully✨ written help menu\s
                     """;
         }
+    }
+
+    private String register(String[] body) {
+        if (body.length < 4) {
+            return "You're missing one or more fields, you need a username, password, and email";
+        }
+        var response = serverFacade.register(new UserData(body[1], body[2], body[3]));
+
+        if (response.getClass() == UserData.class) {
+            return "Successfully registered user :" + ((UserData) response).username();
+        }
+        return response.toString();
+    }
+
+    private String login(String[] body) {
+        if (body.length < 3) {
+            return "You're missing one or more fields, you need a username and password";
+        }
+
+        var response = serverFacade.login(new UserData(body[1], body[2], null));
+
+        if (response.getClass() == AuthData.class) {
+            this.authData = new AuthData(((AuthData) response).authToken(), ((AuthData) response).username());
+            return "Successfully logged in user :" + ((AuthData) response).username();
+        }
+        return response.toString();
     }
 
 }
