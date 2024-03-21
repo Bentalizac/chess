@@ -25,7 +25,6 @@ public class Server {
         var dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
-
         // There's a line about websockets next
     }
 
