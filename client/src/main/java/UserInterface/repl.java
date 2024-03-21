@@ -115,4 +115,9 @@ public class repl {
         return response.toString();
     }
 
+    private String logout() {
+        var response = serverFacade.logout(authData);
+        return response.toString();
+    }
+
 }

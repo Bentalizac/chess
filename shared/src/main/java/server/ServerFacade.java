@@ -27,7 +27,7 @@ public class ServerFacade {
     public Object register(UserData data) {
         var path = "/user";
         try{
-            return this.makeRequest("POST", path, data, UserData.class);
+            return this.makeRequest("POST", path, data, UserData.class, null, null);
         }
         catch(ResponseException ex){
             return ex.getMessage();
@@ -37,19 +37,34 @@ public class ServerFacade {
     public Object login(UserData data) {
         var path = "/session";
         try{
-            return this.makeRequest("POST", path, data, AuthData.class);
+            return this.makeRequest("POST", path, data, AuthData.class, null, null);
         }
         catch(ResponseException ex){
             return ex.getMessage();
         }
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public Object logout(AuthData data) {
+        var path = "/session";
+        try{
+            return this.makeRequest("DELETE", path, data, AuthData.class, "authorization", data.authToken());
+        }
+        catch(ResponseException ex){
+            return ex.getMessage();
+        }
+    }
+
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String headerName, String headerValue) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            // Set the optional header if provided
+            if (headerName != null && headerValue != null) {
+                http.setRequestProperty(headerName, headerValue);
+            }
 
             writeBody(request, http);
             http.connect();
