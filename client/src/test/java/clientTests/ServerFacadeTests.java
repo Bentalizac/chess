@@ -98,4 +98,12 @@ public class ServerFacadeTests {
         assertDoesNotThrow(()->{serverFacade.logout((AuthData) authdata);});
     }
 
+    @Test
+    public void logoutBadAuth() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        serverFacade.login(validUser);
+        var response = serverFacade.logout(new AuthData("faultytoken", validUser.username()));
+        assertEquals("failure: 401", response);
+    }
 }
