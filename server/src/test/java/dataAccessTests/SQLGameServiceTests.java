@@ -34,7 +34,7 @@ public class SQLGameServiceTests {
         //return returnValue;
     }
 
-
+    @BeforeEach
     void clear() throws ResponseException {
         userService.deleteAllData();
         this.positiveSetup();

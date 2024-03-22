@@ -19,7 +19,7 @@ public class DataAccessTests {
         return new MySQLDataAccess();
     }
 
-
+    @BeforeEach
     void clearAll() {
         DataAccess dataAccess = getDataAccess();
         assertDoesNotThrow(dataAccess::clearData);
