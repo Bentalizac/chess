@@ -35,7 +35,7 @@ public class ServerFacadeTests {
         serverFacade = new ServerFacade(port);
 
         validUser = new UserData("a", "a", "a");
-        validGame = new GameData(0, null, null, "testGame", null);
+        validGame = new GameData(1, null, null, "testGame", null);
 
     }
 
@@ -125,6 +125,23 @@ public class ServerFacadeTests {
         assertNull(serverFacade.listGames(new AuthData(null, null)));
     }
 
-
+    @Test
+    public void joinGame() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        AuthData auth = (AuthData) serverFacade.login(validUser);
+        serverFacade.createGame(validGame, auth);
+        var response = serverFacade.joingame(new JoinGameRequest(null, 1), auth);
+        assertEquals("JoinGameRequest[playerColor=null, gameID=0]", response);
+    }
+    @Test
+    public void joinBadGame() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        AuthData auth = (AuthData) serverFacade.login(validUser);
+        serverFacade.createGame(validGame, auth);
+        var response = serverFacade.joingame(new JoinGameRequest(null, 34345), auth);
+        assertEquals("exception.ResponseException: failure: 400", response);
+    }
 
 }
