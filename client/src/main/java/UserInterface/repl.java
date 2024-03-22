@@ -151,7 +151,10 @@ public class repl {
         if (response.getClass() == UserData.class) {
             return "Successfully registered user :" + ((UserData) response).username();
         }
-        return response.toString();
+
+        else{
+            return "That username's already being used. Come up with something more original";
+        }
     }
 
     private String login(String[] body) {

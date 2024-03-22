@@ -66,10 +66,29 @@ public class ServerFacadeTests {
         serverFacade.register(validUser);
         Object response = serverFacade.register(validUser);
         assertSame(response.getClass(), String.class);
-
     }
 
 
+    @Test
+    public void login() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        var response = serverFacade.login(validUser);
 
+        if(response.getClass() == AuthData.class) {
+            AuthData goodResponse = new AuthData(((AuthData) response).authToken(), ((AuthData) response).username());
+            assertEquals(validUser.username(), goodResponse.username());
+        }
+        else{assertEquals(1, 2);}
+    }
+
+    @Test
+    public void loginBadPassword() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        serverFacade.register(validUser);
+        Object response = serverFacade.login(new UserData(validUser.username(), "ThisisWrong", null));
+        assertSame(response.getClass(), String.class);
+    }
 
 }
