@@ -86,9 +86,16 @@ public class ServerFacadeTests {
     public void loginBadPassword() {
         serverFacade.clear();
         serverFacade.register(validUser);
-        serverFacade.register(validUser);
         Object response = serverFacade.login(new UserData(validUser.username(), "ThisisWrong", null));
         assertSame(response.getClass(), String.class);
+    }
+
+    @Test
+    public void logout(){
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        var authdata = serverFacade.login(validUser);
+        assertDoesNotThrow(()->{serverFacade.logout((AuthData) authdata);});
     }
 
 }
