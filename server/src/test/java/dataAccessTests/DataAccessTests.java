@@ -19,7 +19,7 @@ public class DataAccessTests {
         return new MySQLDataAccess();
     }
 
-    @BeforeEach
+
     void clearAll() {
         DataAccess dataAccess = getDataAccess();
         assertDoesNotThrow(dataAccess::clearData);
@@ -144,6 +144,13 @@ public class DataAccessTests {
         var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
         dataAccess.createGame(testGame);
         assertEquals(dataAccess.getGame(testGame.gameID()).game(), testGame.game());
+    }
+
+    @Test
+    void getGames() throws ResponseException {
+        DataAccess dataAccess = getDataAccess();
+        var games = dataAccess.getGames();
+        System.out.print(games.toString());
     }
 
     @Test

@@ -128,10 +128,12 @@ public class Server {
 
     public Object listGames(Request req, Response res) {
         String userToken = req.headers("authorization");
+        System.out.print(userToken);
         try {
             var games = gameService.listGames(userToken);
             res.status(200);
             return new Gson().toJson(Map.of("games", games));
+            //return games;
         }
         catch (ResponseException ex) {
             exceptionHandler(ex, req, res);

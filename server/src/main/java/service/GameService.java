@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import dataAccess.MySQLDataAccess;
@@ -35,7 +36,7 @@ public class GameService {
 
     private GameData buildNewGame(String gameName) { // Builds blank GameData records
         int gameID = dataAccess.getNextID();
-        return new GameData(gameID, null, null, gameName, null);
+        return new GameData(gameID, null, null, gameName, new ChessGame());
     }
 
     public int createGame(String gameName, String authToken) throws ResponseException {

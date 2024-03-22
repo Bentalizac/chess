@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
+import model.JoinGameRequest;
 import model.UserData;
 
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ServerFacade {
     //private final String serverUrl;
@@ -54,11 +57,47 @@ public class ServerFacade {
         }
     }
 
+    public GameData[] listGames(AuthData data) {
+        var path = "/game";
+        try{
+            record listGames(GameData[] games) {};
+            listGames response = this.makeRequest("GET", path, null, listGames.class, "authorization", data.authToken());
+            return response.games;
+        }
+        catch(ResponseException ex){
+            return null;
+        }
+    }
+
+    public String joingame(JoinGameRequest data, AuthData auth) {
+        var path = "/game";
+        try{
+            JoinGameRequest response = this.makeRequest("PUT", path, data, JoinGameRequest.class, "authorization", auth.authToken());
+            return response.toString();
+        }
+        catch(ResponseException ex){
+            return ex.toString();
+        }
+    }
+
+    public int createGame(GameData data, AuthData auth) {
+        var path = "/game";
+
+        try{
+            int response = this.makeRequest("POST", path, data, int.class, "authorization", auth.authToken());
+            return response;
+        }
+        catch(ResponseException ex) {
+            return ex.statusCode();
+        }
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String headerName, String headerValue) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
+
             http.setDoOutput(true);
 
             // Set the optional header if provided
@@ -96,12 +135,24 @@ public class ServerFacade {
         if (http.getContentLength() < 0) {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
+                String output = readString(respBody);
                 if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass);
+                    response = new Gson().fromJson(output, responseClass); // Add the function
                 }
             }
         }
         return response;
+    }
+
+    protected static String readString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        InputStreamReader sr = new InputStreamReader(is);
+        char[] buf = new char[1024];
+        int len;
+        while ((len = sr.read(buf)) > 0) {
+            sb.append(buf, 0, len);
+        }
+        return sb.toString();
     }
 
     private boolean isSuccessful(int status) {

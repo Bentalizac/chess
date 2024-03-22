@@ -24,23 +24,23 @@ public class ChessPiece {
 
         switch (this.type){ // debugging/toString, not needed for functionality
             case KNIGHT:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'N': 'n');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♘': '♞');
                 break;
             case BISHOP:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'B': 'b');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♗': '♝');
                 break;
             case QUEEN:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'Q': 'q');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♕': '♛');
                 break;
             case KING:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'K': 'k');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♔': '♚');
                 break;
             case ROOK:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'R': 'r');
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♖': '♜');
                 break;
             case PAWN:
-                this.strRep = ((pieceColor == ChessGame.TeamColor.WHITE) ? 'P': 'p');
-                this.endRow = ((pieceColor == ChessGame.TeamColor.WHITE) ? 8: 1);
+                this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♙': '♟');
+                this.endRow = ((pieceColor == ChessGame.TeamColor.BLACK) ? 8: 1);
                 break;
             case null:
                 break;
@@ -177,7 +177,6 @@ public class ChessPiece {
                 validMoves.addAll(promotionMoves(myPosition, eastTarget));
             }
         }
-
         return validMoves;
     }
 

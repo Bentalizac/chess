@@ -300,7 +300,6 @@ public class MySQLDataAccess implements DataAccess {
     @Override
     public ArrayList<GameData> getGames() {
         String statement = "SELECT * FROM gameData";
-
         return getGameRecord(statement);
     }
     private int nextGameId = 1;
