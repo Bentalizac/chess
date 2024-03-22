@@ -1,7 +1,6 @@
 package clientTests;
 
-import model.AuthData;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -10,7 +9,6 @@ import dataAccess.MemoryDataAccess;
 import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
-import model.JoinGameRequest;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +24,8 @@ public class ServerFacadeTests {
     private static ServerFacade serverFacade;
 
     private static UserData validUser;
+
+    private static GameData validGame;
     @BeforeAll
     public static void init() {
         server = new Server();
@@ -35,6 +35,7 @@ public class ServerFacadeTests {
         serverFacade = new ServerFacade(port);
 
         validUser = new UserData("a", "a", "a");
+        validGame = new GameData(0, null, null, "testGame", null);
 
     }
 
@@ -103,7 +104,27 @@ public class ServerFacadeTests {
         serverFacade.clear();
         serverFacade.register(validUser);
         serverFacade.login(validUser);
-        var response = serverFacade.logout(new AuthData("faultytoken", validUser.username()));
+        var response = serverFacade.logout(new AuthData(null, validUser.username()));
         assertEquals("failure: 401", response);
     }
+
+    @Test
+    public void listGames() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        AuthData auth = (AuthData) serverFacade.login(validUser);
+        serverFacade.createGame(validGame, auth);
+        assertEquals(1, serverFacade.listGames(auth).length);
+    }
+    @Test
+    public void listGamesBadAuth() {
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        AuthData auth = (AuthData) serverFacade.login(validUser);
+        serverFacade.createGame(validGame, auth);
+        assertNull(serverFacade.listGames(new AuthData(null, null)));
+    }
+
+
+
 }

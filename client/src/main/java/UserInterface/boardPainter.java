@@ -8,8 +8,6 @@ import chess.ChessPosition;
 import static chess.EscapeSequences.*;
 
 public class boardPainter {
-
-
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final int LINE_WIDTH_IN_CHARS = 1;
