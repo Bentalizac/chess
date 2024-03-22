@@ -6,6 +6,19 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import dataAccess.MemoryDataAccess;
+import dataAccess.MySQLDataAccess;
+import exception.ResponseException;
+import model.AuthData;
+import model.JoinGameRequest;
+import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import service.GameService;
+import service.UserService;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class ServerFacadeTests {
 
@@ -39,9 +52,24 @@ public class ServerFacadeTests {
     @Test
     public void register(){
         serverFacade.clear();
-        var response = serverFacade.register(validUser);
-        System.out.print(response);
+        Object response = serverFacade.register(validUser);
+        if(response.getClass() == UserData.class) {
+            UserData goodResponse = new UserData(((UserData) response).username(), ((UserData) response).password(), ((UserData) response).email());
+            assertEquals(validUser.username(), goodResponse.username());
+        }
+        else{assertEquals(1, 2);}
     }
+
+    @Test
+    public void doubleRegister(){
+        serverFacade.clear();
+        serverFacade.register(validUser);
+        Object response = serverFacade.register(validUser);
+        assertSame(response.getClass(), String.class);
+
+    }
+
+
 
 
 }
