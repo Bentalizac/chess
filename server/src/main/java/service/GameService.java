@@ -44,7 +44,6 @@ public class GameService {
         if (authorization == null || authorization.authToken() == null) {
             throw new ResponseException(401, "error: TOKEN NOT AUTHORIZED");
         }
-
         GameData game = this.buildNewGame(gameName);
         dataAccess.createGame(game);
         return game.gameID();

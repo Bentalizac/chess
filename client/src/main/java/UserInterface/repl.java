@@ -1,10 +1,7 @@
 package UserInterface;
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+
 import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
@@ -22,7 +19,7 @@ public class repl {
     AuthData authData = null;
     String DECOROW = (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + SET_BG_COLOR_DARK_GREY;
     String DECOROW2 = (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + SET_BG_COLOR_DARK_GREY;
-    EscapeSequences ui = new EscapeSequences();
+
     ServerFacade serverFacade = new ServerFacade(8080);
 
     public void runREPL(String[] args) {
@@ -250,7 +247,7 @@ public class repl {
     }
     private String createGame(String[] body) {
         GameData data = new GameData(0, null, null, body[1], null);
-        int response = serverFacade.createGame(data, authData);
+        var response = serverFacade.createGame(data, authData);
         return "";
     }
     private String drawBoards() {

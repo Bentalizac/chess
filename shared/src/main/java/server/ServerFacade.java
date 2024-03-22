@@ -18,8 +18,6 @@ import java.net.URL;
 public class ServerFacade {
     //private final String serverUrl;
     private final String serverUrl;
-    private int statusCode;
-
 
 
     public ServerFacade(int port) {
@@ -69,7 +67,7 @@ public class ServerFacade {
     public GameData[] listGames(AuthData data) {
         var path = "/game";
         try{
-            record listGames(GameData[] games) {};
+            record listGames(GameData[] games) {}
             listGames response = this.makeRequest("GET", path, null, listGames.class, "authorization", data.authToken());
             return response.games;
         }
@@ -89,15 +87,14 @@ public class ServerFacade {
         }
     }
 
-    public int createGame(GameData data, AuthData auth) {
+    public Object createGame(GameData data, AuthData auth) {
         var path = "/game";
-
         try{
-            int response = this.makeRequest("POST", path, data, int.class, "authorization", auth.authToken());
-            return response;
+            return this.makeRequest("POST", path, data, Object.class, "authorization", auth.authToken());
         }
         catch(ResponseException ex) {
-            return ex.statusCode();
+            //System.out.print(ex.getMessage());
+            return ex.toString();
         }
     }
 
