@@ -40,7 +40,7 @@ public class ChessPiece {
                 break;
             case PAWN:
                 this.strRep = ((pieceColor == ChessGame.TeamColor.BLACK) ? '♙': '♟');
-                this.endRow = ((pieceColor == ChessGame.TeamColor.BLACK) ? 8: 1);
+                this.endRow = ((pieceColor == ChessGame.TeamColor.WHITE) ? 8: 1);
                 break;
             case null:
                 break;
@@ -177,6 +177,7 @@ public class ChessPiece {
                 validMoves.addAll(promotionMoves(myPosition, eastTarget));
             }
         }
+
         return validMoves;
     }
 
