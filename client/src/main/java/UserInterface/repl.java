@@ -14,25 +14,30 @@ import ui.EscapeSequences;
 
 import java.util.*;
 
+import static chess.EscapeSequences.*;
+
 
 public class repl {
 
     AuthData authData = null;
+    String DECOROW = (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + SET_BG_COLOR_DARK_GREY;
+    String DECOROW2 = (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + SET_BG_COLOR_DARK_GREY;
     EscapeSequences ui = new EscapeSequences();
-    ServerFacade serverFacade = new ServerFacade("HTTP://localhost:8080");
+    ServerFacade serverFacade = new ServerFacade(8080);
 
     public void runREPL(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print(EscapeSequences.WHITE_KING + " Welcome to this 240 Chess Nonsense " + EscapeSequences.BLACK_KING + "\n");
+        System.out.print("   " + EscapeSequences.WHITE_KING + " Welcome to this 240 Chess Nonsense " + EscapeSequences.BLACK_KING + "\n");
         while (true) {
             // Prompt user for input
-            System.out.print("\nType Help to get started: ");
+            System.out.print(DECOROW+DECOROW  +"\n" + DECOROW2+DECOROW2  + "\nType Help to get started \n "+ SET_TEXT_BLINKING+ ">>>" + RESET_TEXT_BLINKING);
             String userInput = scanner.nextLine();
             String response = parseInput(userInput);
             if (Objects.equals(response, "quit")) {
                 break;
             }
-            System.out.print(response);
+            System.out.print(SET_BG_COLOR_DARK_GREY+ response + "\n");
+
         }
         scanner.close();
     }
@@ -178,8 +183,12 @@ public class repl {
         }
         String output = "Here's all the games we've got, any catch your eye?\n";
         GameData[] response = serverFacade.listGames(authData);
+        if(response.length == 0) {
+            output += "... Well that's a bit awkward. There's no games going. Maybe start your own? \n";
+            return output;
+        }
         for (GameData data : response) {
-            output += "Game number: " + data.gameID() + " Name: " + data.gameName();
+            output += "[Game number: " + data.gameID() + " Name: " + data.gameName() + "] ";
             if (data.whiteUsername() != null) {
                 output += ", has " + data.whiteUsername() + " playing white.";
             }
@@ -200,29 +209,42 @@ public class repl {
             return "ACCESS DENIED.";
         }
         String response = "";
-        String output = "";
+        String output = "That game doesn't exist, gimme a different number. \n";
         if (body.length < 2) {
             return "You're missing one or more pieces of info, I need a game number at least, and a color would be nice";
         }
+
+        try{ // Checks to see if the correct part is a number
+            int x = Integer.parseInt(body[1]);
+        }
+        catch(NumberFormatException ex){
+            return "Gimme a number, I can't get you in a game by name.";
+        }
         if (body.length == 2) {
-            try{
-                int x = Integer.parseInt(body[1]);
-            }
-            catch(NumberFormatException ex){
-                return "Gimme a number, I can't get you in a game by name.";
-            }
             response = serverFacade.joingame(new JoinGameRequest(null, Integer.parseInt(body[1])), authData);
-            output = "Feel free to watch I guess, its better when you play though";
-            drawBoards();
+            if(gameExists(response)) {
+                output = "Feel free to watch I guess, its better when you play though";
+            }
         }
         else {
             response = serverFacade.joingame(new JoinGameRequest(body[2].toUpperCase(), Integer.parseInt(body[1])), authData);
-            output = "Welcome to the game! May luck be on your side!";
-            drawBoards();
+            if(gameExists(response)) {
+                output = "Welcome to the game! May luck be on your side!";
+            }
         }
         return output;
     }
 
+    private boolean gameExists(String response) {
+        String[] list = response.split(" ");
+        for (String word : list) {
+            if(Objects.equals(word, "400")) {
+                return false;
+            }
+        }
+        drawBoards();
+        return true;
+    }
     private String createGame(String[] body) {
         GameData data = new GameData(0, null, null, body[1], null);
         int response = serverFacade.createGame(data, authData);

@@ -40,8 +40,6 @@ public class SQLGameServiceTests {
         this.positiveSetup();
     }
 
-
-
     @Test
     void createGame() {
         String testname = "testgame";

@@ -40,6 +40,7 @@ public class boardPainter {
         return output + SET_BG_COLOR_DARK_GREY;
     }
 
+
     public String drawBlackDown() {
         String output = "\n";
         for (int y = 1; y <9; y++){

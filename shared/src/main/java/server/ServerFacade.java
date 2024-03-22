@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class ServerFacade {
     //private final String serverUrl;
@@ -23,8 +22,18 @@ public class ServerFacade {
 
 
 
-    public ServerFacade(String url) {
-        serverUrl = url;
+    public ServerFacade(int port) {
+        serverUrl = "HTTP://localhost:" + port;
+    }
+
+    public void clear(){
+        var path = "/db";
+        try{
+            this.makeRequest("DELETE", path, null, UserData.class, null, null);
+        }
+        catch(ResponseException ex){
+            ex.getMessage();
+        }
     }
 
     public Object register(UserData data) {
