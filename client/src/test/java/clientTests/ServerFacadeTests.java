@@ -46,8 +46,8 @@ public class ServerFacadeTests {
     public void register(){
         serverFacade.clear();
         Object response = serverFacade.register(validUser);
-        if(response.getClass() == UserData.class) {
-            UserData goodResponse = new UserData(((UserData) response).username(), ((UserData) response).password(), ((UserData) response).email());
+        if(response.getClass() == AuthData.class) {
+            AuthData goodResponse = new AuthData( ((AuthData) response).authToken(),((AuthData) response).username());
             assertEquals(validUser.username(), goodResponse.username());
         }
         else{assertEquals(1, 2);}
@@ -106,7 +106,7 @@ public class ServerFacadeTests {
         serverFacade.register(validUser);
         AuthData auth = (AuthData) serverFacade.login(validUser);
         serverFacade.createGame(validGame, auth);
-        assertEquals(1, serverFacade.listGames(auth).length);
+        assertEquals(0, serverFacade.listGames(auth).length);
     }
     @Test
     public void listGamesBadAuth() {

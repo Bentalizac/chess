@@ -145,8 +145,9 @@ public class repl {
         }
         var response = serverFacade.register(new UserData(body[1], body[2], body[3]));
 
-        if (response.getClass() == UserData.class) {
-            return "Successfully registered user :" + ((UserData) response).username();
+        if (response.getClass() == AuthData.class) {
+            this.authData = ((AuthData) response);
+            return "Successfully registered user :" + ((AuthData) response).username() + "welcome to the most mediocre chess program you'll likely use.";
         }
 
         else{
@@ -246,6 +247,14 @@ public class repl {
         return true;
     }
     private String createGame(String[] body) {
+        if (loginGate()) {
+            return "ACCESS DENIED.";
+        }
+
+        if (body.length < 2) {
+            return "All you need to make a game is a name, you can give me that much at least. \nBe better.";
+        }
+
         GameData data = new GameData(0, null, null, body[1], null);
         var response = serverFacade.createGame(data, authData);
         return "";

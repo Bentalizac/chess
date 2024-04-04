@@ -37,7 +37,7 @@ public class ServerFacade {
     public Object register(UserData data) {
         var path = "/user";
         try{
-            return this.makeRequest("POST", path, data, UserData.class, null, null);
+            return this.makeRequest("POST", path, data, AuthData.class, null, null);
         }
         catch(ResponseException ex){
             return ex.getMessage();

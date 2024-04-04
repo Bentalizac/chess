@@ -50,7 +50,7 @@ public class MySQLDataAccess implements DataAccess {
 
             """
             CREATE TABLE IF NOT EXISTS gameData (
-              `id` int NOT NULL,
+              `id` int NOT NULL AUTO_INCREMENT,
               `gameName` varchar(50) NOT NULL,
               `whiteUsername` varchar(100) DEFAULT NULL,
               `blackUsername` varchar(100) DEFAULT NULL,
@@ -64,7 +64,7 @@ public class MySQLDataAccess implements DataAccess {
 
     private int executeUpdate(String statement, Object... params) throws ResponseException { // Can be used for C, U, and D, not R
         try(var conn = DatabaseManager.getConnection()){
-            try(var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+            try(var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) { // This is the ID
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
                     switch (param) {
@@ -228,7 +228,9 @@ public class MySQLDataAccess implements DataAccess {
         }
         try {
             var json = response.getString("gameData");
-            return new Gson().fromJson(json, GameData.class);
+            var result =  new Gson().fromJson(json, GameData.class);
+            int id = response.getInt("id");
+            return new GameData(id, result.whiteUsername(), result.blackUsername(), result.gameName(), result.game());
         }
         catch(SQLException ex) {
             return null;
@@ -302,25 +304,28 @@ public class MySQLDataAccess implements DataAccess {
         String statement = "SELECT * FROM gameData";
         return getGameRecord(statement);
     }
-    private int nextGameId = 1;
+
     @Override
     public int getNextID() {
-        return nextGameId;
+        String statement = "SELECT * FROM gameData WHERE id = (SELECT MAX(ID) FROM gameData)";
+        var response = getGameRecord(statement);
+        return response.getFirst().gameID();
     }
 
     @Override
     public void createGame(GameData game) throws ResponseException{
         var json = new Gson().toJson(game);
         var gameJson = new Gson().toJson(game.game());
-        String statement ="INSERT INTO gameData (id, gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?,?)";
-        executeUpdate(statement, game.gameID(), game.gameName(),game.whiteUsername(),game.blackUsername(), gameJson, json);
-        this.nextGameId += 1;
+        String statement ="INSERT INTO gameData (gameName, whiteUsername, blackUsername, gameJSON, gameData) VALUES (?,?,?,?,?)";
+        int id = executeUpdate(statement, game.gameName(),game.whiteUsername(),game.blackUsername(), gameJson, json);
+        System.out.print(id);
+
     }
 
 
     @Override
     public GameData getGame(int gameID) {
-        String statement = "SELECT gameData FROM gameData WHERE id=?";
+        String statement = "SELECT * FROM gameData WHERE id=?";
         var gameDataResponse = getGameRecord(statement, gameID);
 
         if(gameDataResponse == null) {
