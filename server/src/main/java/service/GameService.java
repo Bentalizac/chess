@@ -74,13 +74,13 @@ public class GameService {
         if (info.playerColor() != null) {
             GameData newGameData;
             if(info.playerColor().equals("BLACK")) {
-                if (existingGame.blackUsername() != null){
+                if (existingGame.blackUsername() != null && !existingGame.blackUsername().equals(authorization.username())){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
                 newGameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authorization.username(), existingGame.gameName(), existingGame.game());
             }
             else if(info.playerColor().equals("WHITE")) {
-                if (existingGame.whiteUsername() != null){
+                if (existingGame.whiteUsername() != null  && !existingGame.whiteUsername().equals(authorization.username())){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
                 newGameData = new GameData(existingGame.gameID(),  authorization.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game());

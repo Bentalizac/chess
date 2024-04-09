@@ -29,6 +29,9 @@ public class Server {
     }
 
     public int run(int desiredPort) {
+
+        Spark.webSocket("/connect", webSocketHandler);
+
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
