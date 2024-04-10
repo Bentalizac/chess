@@ -309,7 +309,12 @@ public class MySQLDataAccess implements DataAccess {
     public int getNextID() {
         String statement = "SELECT * FROM gameData WHERE id = (SELECT MAX(ID) FROM gameData)";
         var response = getGameRecord(statement);
-        return response.getFirst().gameID();
+        if (!response.isEmpty()) {
+            return response.getFirst().gameID();
+        }
+        else{
+            return 1;
+        }
     }
 
     @Override
