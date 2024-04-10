@@ -93,7 +93,7 @@ public class ServerFacade {
             return this.makeRequest("POST", path, data, Object.class, "authorization", auth.authToken());
         }
         catch(ResponseException ex) {
-            //System.out.print(ex.getMessage());
+            System.out.print(ex.getMessage());
             return ex.toString();
         }
     }

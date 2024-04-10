@@ -1,5 +1,6 @@
 package server;
 
+import WebSocket.WebSocketHandler;
 import dataAccess.MemoryDataAccess;
 import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
@@ -20,20 +21,26 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
 
+    private WebSocketHandler webSocketHandler;
+
     public Server() {
         //var dataAccess = new MemoryDataAccess();
         var dataAccess = new MySQLDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
+
+        webSocketHandler = new WebSocketHandler();
+
         // There's a line about websockets next
     }
 
     public int run(int desiredPort) {
 
-        Spark.webSocket("/connect", webSocketHandler);
 
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/connect", WebSocketHandler.class);
 
         // Register your endpoints and handle exceptions here.
 

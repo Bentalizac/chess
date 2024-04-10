@@ -200,7 +200,14 @@ public class ChessBoard {
     }
 
     public Collection<ChessMove> getPieceMoves(ChessPosition myPosition) {
-        return this.getPiece(myPosition).pieceMoves(this, myPosition);
+        var piece = this.getPiece(myPosition);
+        if(piece == null) {
+            return new ArrayList<>();
+        }
+        else {
+            return piece.pieceMoves(this, myPosition);
+        }
+
     }
 
 

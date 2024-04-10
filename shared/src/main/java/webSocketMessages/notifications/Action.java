@@ -1,8 +1,9 @@
 package webSocketMessages.notifications;
 
 import com.google.gson.Gson;
+import model.AuthData;
 
-public record Action(Type type, String visitorName) {
+public record Action(Type type, AuthData auth) {
     public enum Type {
         JOIN_PLAYER,
         JOIN_OBSERVER,

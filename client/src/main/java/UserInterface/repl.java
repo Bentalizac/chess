@@ -2,11 +2,14 @@ package UserInterface;
 import chess.ChessBoard;
 import chess.ChessGame;
 
+import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
 import model.UserData;
+import server.NotificationHandler;
 import server.ServerFacade;
+import server.WebSocketFacade;
 import ui.EscapeSequences;
 
 import java.util.*;
@@ -21,6 +24,7 @@ public class repl {
     String DECOROW2 = (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + SET_BG_COLOR_DARK_GREY;
 
     ServerFacade serverFacade = new ServerFacade(8080);
+    WebSocketFacade webSocketFacade;
 
     public void runREPL(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -224,7 +228,17 @@ public class repl {
         if (body.length == 2) {
             response = serverFacade.joingame(new JoinGameRequest(null, Integer.parseInt(body[1])), authData);
             if(gameExists(response)) {
-                output = "Feel free to watch I guess, its better when you play though";
+
+                try {
+                    webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
+                    webSocketFacade.spectate(authData);
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]));
+                    game.run();
+                }
+                catch(ResponseException ex) {
+                    return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
+                }
+                output = "How was the show? Hope you're into chess if you're here to watch people play of all things...";
             }
         }
         else {

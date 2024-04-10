@@ -1,5 +1,7 @@
 package UserInterface;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import ui.EscapeSequences;
@@ -10,15 +12,18 @@ import java.util.Scanner;
 import static chess.EscapeSequences.*;
 import static java.lang.Integer.parseInt;
 
-public class playMenu {
+public class PlayMenu {
 
     String DECOROW = (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + SET_BG_COLOR_DARK_GREY;
     String DECOROW2 = (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + SET_BG_COLOR_DARK_GREY;
     int gameID;
 
+    ChessGame game;
+
     //WebSocketFacade socketFacade;
 
-    public playMenu(int gameID) {this.gameID = gameID;}
+    public PlayMenu(int gameID) {this.gameID = gameID;
+    this.game = getGame(gameID);}
 
     public void run() {
         Scanner playScanner = new Scanner(System.in);
@@ -34,7 +39,7 @@ public class playMenu {
             System.out.print(SET_BG_COLOR_DARK_GREY+ response + "\n");
 
         }
-        playScanner.close();
+        //playScanner.close();
     }
 
     private String parseInput(String userInput) { // Break user input by spaces to be able to handle usernames and registration and such
@@ -49,6 +54,13 @@ public class playMenu {
             }
             case "move" -> {
                 return makeMove(body);
+            }
+            case "redraw" -> {
+                redraw();
+                return "";
+            }
+            case "highlight" -> {
+                highlight(body);
             }
         }
         return "Just ask for help if you don't know what else to say";
@@ -114,5 +126,42 @@ public class playMenu {
         return "This is filler to run this thing";
     }
 
+    private ChessGame getGame(int gameID) {
+        // TODO use websocket to fetch chessgame from server
+        return new ChessGame();
+    }
+
+    public void redraw(){
+        ChessGame game = new ChessGame();
+        boardPainter painter = new boardPainter(game.getBoard());
+        if (game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
+            painter.drawBlackDown();
+        }
+        else {
+            painter.drawWhiteDown();
+        }
+    }
+
+    public String highlight(String [] body) {
+        if (body.length < 2) {
+            return "You're missing one or more fields, you need a starting coordinate, and an ending coordinate";
+        }
+        String start = body[1];
+        ChessPosition startTile;
+
+        if (start.length() != 2){
+            return "Those coordinates are invalid, try again please.";
+        }
+        try{
+            startTile = stringToCoord(start);
+        }
+        catch(InvalidCoordinatesError ex) {
+            return ex.getMessage();
+        }
+
+        boardPainter painter = new boardPainter(game.getBoard());
+        painter.highlight(startTile, game);
+        return "";
+    }
 
 }
