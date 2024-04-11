@@ -43,6 +43,12 @@ public class PlayMenu {
             String userInput = playScanner.nextLine();
             String response = parseInput(userInput);
             if (Objects.equals(response, "quit")) {
+                try {
+                    webSocketFacade.leave(authData, gameID);
+                }
+                catch (ResponseException ex) {
+                    System.out.print("Musta been a connection issue, this things says \n" + ex.getMessage() + "\nTry that again in a bit. Or ALT+F4");
+                }
                 break;
             }
             System.out.print(SET_BG_COLOR_DARK_GREY+ response + "\n");

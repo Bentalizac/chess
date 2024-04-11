@@ -20,6 +20,7 @@ public class ConnectionManager {
     }
     public void remove(String authToken) {
         connections.remove(authToken);
+        gameConnections.remove(authToken);
     }
     public void sendMessage(String username, ServerMessage message) throws IOException {
         var c = connections.get(username);

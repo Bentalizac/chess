@@ -8,10 +8,7 @@ import model.AuthData;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.SpectateCommand;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 
 import javax.websocket.*;
@@ -78,6 +75,15 @@ public class WebSocketFacade extends Endpoint{
     public void move(AuthData data, ChessMove move, int gameID) throws ResponseException {
         try {
             var action = new MakeMoveCommand(data.authToken(), move, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void leave(AuthData data, int gameID) throws ResponseException {
+        try {
+            var action = new LeaveCommand(data.authToken(), gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

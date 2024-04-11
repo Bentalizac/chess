@@ -18,10 +18,7 @@ import webSocketMessages.serverMessages.ErrorNotification;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinCommand;
-import webSocketMessages.userCommands.MakeMoveCommand;
-import webSocketMessages.userCommands.SpectateCommand;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -44,6 +41,7 @@ public class WebSocketHandler {
             case JOIN_OBSERVER -> spectate(new SpectateCommand(action.getAuthString(), action.getGameID()), session);
             case JOIN_PLAYER ->  join(new JoinCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
             case MAKE_MOVE ->  makeMove(new MakeMoveCommand( action.getAuthString(), action.getMove(), action.getGameID()), session);
+            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
         }
     }
 
@@ -78,6 +76,31 @@ public class WebSocketHandler {
         }
         var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, request.getPlayerColor());
         connections.sendMessage(auth.authToken(), response);
+    }
+
+    private void leave(LeaveCommand request, Session session) throws IOException {
+
+        connections.add(request.getAuthString(), session, request.getGameID());
+        AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
+        String username;
+
+        if(auth == null){
+            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        else{
+            username = auth.username();
+        }
+
+        var message = username + " Has left the game. What a loser.\n";
+        System.out.print(message);
+        var notification = new webSocketMessages.serverMessages.Notification(message);
+        connections.broadcast(auth.authToken(), notification, request.getGameID());
+        connections.remove(request.getAuthString());
+        connections.remove(username);
     }
 
     private void join(JoinCommand request,Session session) throws IOException {
