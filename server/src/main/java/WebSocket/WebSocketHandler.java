@@ -98,6 +98,12 @@ public class WebSocketHandler {
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
+        if ((game.whiteUsername()!=null && !game.whiteUsername().equals(username)) || (game.blackUsername() != null && !game.blackUsername().equals(username)) ){
+            var error = new ErrorNotification("ERROR: That seat is already taken, find another.\n");
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
         var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
         connections.sendMessage(auth.authToken(), response);
 
