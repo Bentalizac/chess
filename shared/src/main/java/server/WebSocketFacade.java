@@ -1,10 +1,14 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
-import webSocketMessages.notifications.Action;
-import webSocketMessages.notifications.Notification;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.userCommands.JoinCommand;
+import webSocketMessages.userCommands.SpectateCommand;
+import webSocketMessages.userCommands.UserGameCommand;
+
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -42,9 +46,18 @@ public class WebSocketFacade extends Endpoint{
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void spectate(AuthData data) throws ResponseException {
+    public void spectate(AuthData data, int gameID) throws ResponseException {
         try {
-            var action = new Action(Action.Type.JOIN_OBSERVER, data);
+            var action = new SpectateCommand(data.authToken(), gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void join(AuthData data, ChessGame.TeamColor color, int gameID) throws ResponseException {
+        try {
+            var action = new JoinCommand(data.authToken(), gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

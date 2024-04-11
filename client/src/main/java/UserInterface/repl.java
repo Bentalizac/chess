@@ -231,7 +231,7 @@ public class repl {
 
                 try {
                     webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
-                    webSocketFacade.spectate(authData);
+                    webSocketFacade.spectate(authData, Integer.parseInt(body[1]));
                     PlayMenu game = new PlayMenu(Integer.parseInt(body[1]));
                     game.run();
                 }
@@ -244,7 +244,25 @@ public class repl {
         else {
             response = serverFacade.joingame(new JoinGameRequest(body[2].toUpperCase(), Integer.parseInt(body[1])), authData);
             if(gameExists(response)) {
+                ChessGame.TeamColor color = null;
+                if (body[2].equalsIgnoreCase("WHITE")) {
+                    color = ChessGame.TeamColor.WHITE;
+                }
+                else{
+                    color = ChessGame.TeamColor.BLACK;
+                }
+                try {
+                    webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
+                    webSocketFacade.join(authData, color, Integer.parseInt(body[1]));
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]));
+                    game.run();
+                }
+                catch(ResponseException ex) {
+                    return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
+                }
+
                 output = "Welcome to the game! May luck be on your side!";
+
             }
         }
         return output;

@@ -1,13 +1,17 @@
 package WebSocket;
 
 import com.google.gson.Gson;
+import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import webSocketMessages.notifications.Action;
-import webSocketMessages.notifications.Notification;
+import service.GameService;
+import service.UserService;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.JoinCommand;
 import webSocketMessages.userCommands.SpectateCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -18,21 +22,47 @@ import java.io.IOException;
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    private final MySQLDataAccess dataAccess;
+
+    public WebSocketHandler() {
+        this.dataAccess  = new MySQLDataAccess();
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        Action action = new Gson().fromJson(message, Action.class);
-        switch (action.type()) {
-            case JOIN_OBSERVER -> spectate( new SpectateCommand(action.auth()), session);
+        UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
+        switch (action.getCommandType()) {
+            case JOIN_OBSERVER -> spectate(new SpectateCommand(action.getAuthString(), action.getGameID()), session);
+            case JOIN_PLAYER ->  join(new JoinCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
         }
     }
 
     private void spectate(SpectateCommand input, Session session) throws IOException {
-        connections.add(input.getUsername(), session);
-        var message = input.getUsername() + " has started stalking this game\n";
-        var notification = new Notification(Notification.Type.JOIN_OBSERVER, message);
-        connections.broadcast(input.getUsername(), notification);
+
+        String username = dataAccess.getUserByAuth(input.getAuthString()).username();
+
+        connections.add(username, session);
+        var message = username + " has started stalking this game\n";
+        var notification = new webSocketMessages.serverMessages.Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(username, notification);
+
+        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(input.gameID()));
+        connections.sendMessage(username, response);
     }
 
+    private void join(JoinCommand join,Session session) throws IOException {
+
+        String username = dataAccess.getUserByAuth(join.getAuthString()).username();
+
+        connections.add(username, session);
+        var message = username + " Has joined the game playing " + join.getColor() + "\n";
+        System.out.print(message);
+        var notification = new webSocketMessages.serverMessages.Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(username, notification);
+
+        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(join.gameID()));
+        connections.sendMessage(username, response);
+
+    }
 
 }

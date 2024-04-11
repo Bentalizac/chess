@@ -1,10 +1,11 @@
 package server;
 
-import webSocketMessages.notifications.Notification;
+
+import webSocketMessages.serverMessages.Notification;
 
 public class NotificationHandler {
     public void notify(Notification notification) {
-        System.out.println(notification.message());
+        System.out.println(notification.getMessage());
         printPrompt();
     }
 
