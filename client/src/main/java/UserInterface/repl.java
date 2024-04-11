@@ -1,4 +1,5 @@
 package UserInterface;
+import chess.BoardPainter;
 import chess.ChessBoard;
 import chess.ChessGame;
 
@@ -232,7 +233,7 @@ public class repl {
                 try {
                     webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
                     webSocketFacade.spectate(authData, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]));
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData);
                     game.run();
                 }
                 catch(ResponseException ex) {
@@ -254,7 +255,7 @@ public class repl {
                 try {
                     webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
                     webSocketFacade.join(authData, color, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]));
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData);
                     game.run();
                 }
                 catch(ResponseException ex) {
@@ -275,7 +276,7 @@ public class repl {
                 return false;
             }
         }
-        drawBoards();
+        //drawBoards();
         return true;
     }
     private String createGame(String[] body) {
@@ -297,7 +298,7 @@ public class repl {
         ChessBoard board =game.getBoard();
         board.resetBoard();
         //board.addPiece(new ChessPosition(5, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        boardPainter painter = new boardPainter(board);
+        BoardPainter painter = new BoardPainter(board);
         painter.drawWhiteDown();
         painter.drawBlackDown();
         return "";

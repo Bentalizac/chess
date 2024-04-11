@@ -4,7 +4,6 @@ import model.AuthData;
 
 public class SpectateCommand extends UserGameCommand{
 
-    private final int gameID;
 
     public SpectateCommand(String authToken, int gameID) {
         super(authToken);
@@ -12,5 +11,4 @@ public class SpectateCommand extends UserGameCommand{
         this.gameID = gameID;
     }
 
-    public int gameID() {return this.gameID;}
 }

@@ -1,9 +1,13 @@
 package UserInterface;
 
-import chess.ChessBoard;
+import chess.BoardPainter;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
+import exception.ResponseException;
+import model.AuthData;
+import server.NotificationHandler;
+import server.WebSocketFacade;
 import ui.EscapeSequences;
 
 import java.util.Objects;
@@ -19,11 +23,16 @@ public class PlayMenu {
     int gameID;
 
     ChessGame game;
+    WebSocketFacade webSocketFacade;
+    AuthData authData;
 
     //WebSocketFacade socketFacade;
 
-    public PlayMenu(int gameID) {this.gameID = gameID;
-    this.game = getGame(gameID);}
+    public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth) {this.gameID = gameID;
+    this.game = getGame(gameID);
+    this.webSocketFacade = webSocketFacade;
+    authData = auth;
+    }
 
     public void run() {
         Scanner playScanner = new Scanner(System.in);
@@ -123,6 +132,15 @@ public class PlayMenu {
         }
         ChessMove move = new ChessMove(startTile, endTile);
 
+        try {
+            webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
+            webSocketFacade.move(authData, move, gameID);
+
+        }
+        catch(ResponseException ex) {
+            return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
+        }
+
         return "This is filler to run this thing";
     }
 
@@ -133,7 +151,7 @@ public class PlayMenu {
 
     public void redraw(){
         ChessGame game = new ChessGame();
-        boardPainter painter = new boardPainter(game.getBoard());
+        BoardPainter painter = new BoardPainter(game.getBoard());
         if (game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
             painter.drawBlackDown();
         }
@@ -159,7 +177,7 @@ public class PlayMenu {
             return ex.getMessage();
         }
 
-        boardPainter painter = new boardPainter(game.getBoard());
+        BoardPainter painter = new BoardPainter(game.getBoard());
         painter.highlight(startTile, game);
         return "";
     }

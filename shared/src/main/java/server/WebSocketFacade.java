@@ -1,11 +1,15 @@
 package server;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.AuthData;
+import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinCommand;
+import webSocketMessages.userCommands.MakeMoveCommand;
 import webSocketMessages.userCommands.SpectateCommand;
 import webSocketMessages.userCommands.UserGameCommand;
 
@@ -31,7 +35,14 @@ public class WebSocketFacade extends Endpoint{
                 @Override
                 public void onMessage(String message) {
                     Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
+
+                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
+                        notificationHandler.loadGame(gameNotification);
+                    }
+                    else {
+                        notificationHandler.notify(notification);
+                    }
                 }
             });
         }
@@ -58,6 +69,15 @@ public class WebSocketFacade extends Endpoint{
     public void join(AuthData data, ChessGame.TeamColor color, int gameID) throws ResponseException {
         try {
             var action = new JoinCommand(data.authToken(), gameID, color);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    public void move(AuthData data, ChessMove move, int gameID) throws ResponseException {
+        try {
+            var action = new MakeMoveCommand(data.authToken(), move, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

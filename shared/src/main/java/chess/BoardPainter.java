@@ -1,20 +1,19 @@
-package UserInterface;
+package chess;
 
 import chess.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static chess.EscapeSequences.*;
 
-public class boardPainter {
+public class BoardPainter {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
     private static final int SQUARE_SIZE_IN_CHARS = 3;
     private static final int LINE_WIDTH_IN_CHARS = 1;
     private static final String EMPTY = "   ";
 
     private ChessBoard board;
-    public boardPainter(ChessBoard inBoard) {
+    public BoardPainter(ChessBoard inBoard) {
         board = inBoard;
     }
 
