@@ -39,42 +39,67 @@ public class WebSocketHandler {
         }
     }
 
-    private void spectate(SpectateCommand input, Session session) throws IOException {
+    private void spectate(SpectateCommand request, Session session) throws IOException {
 
-        String username = dataAccess.getUserByAuth(input.getAuthString()).username();
-
-        connections.add(username, session);
-        var message = username + " has started stalking this game\n";
-        var notification = new webSocketMessages.serverMessages.Notification(message);
-        connections.broadcast(username, notification);
-
-        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(input.gameID()));
-        connections.sendMessage(username, response);
-    }
-
-    private void join(JoinCommand join,Session session) throws IOException {
-        connections.add(join.getAuthString(), session);
-        AuthData auth = dataAccess.getUserByAuth(join.getAuthString());
+        AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
         String username;
+        connections.add(request.getAuthString(), session);
 
-        if(auth == null){
+        if (auth == null) {
             var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(join.getAuthString(), error);
-            connections.remove(join.getAuthString()); // Disconnect erroneous connection
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
         else{
             username = auth.username();
         }
 
-        var message = username + " Has joined the game playing " + join.getColor() + "\n";
+        var message = username + " has started stalking this game\n";
+        var notification = new webSocketMessages.serverMessages.Notification(message);
+        connections.broadcast(auth.authToken(), notification);
+
+        var game = dataAccess.getGame(request.gameID());
+        if (game == null) {
+            var error = new ErrorNotification("ERROR: Game not found, check your game ID again.\n");
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        connections.sendMessage(auth.authToken(), response);
+    }
+
+    private void join(JoinCommand request,Session session) throws IOException {
+        connections.add(request.getAuthString(), session);
+        AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
+        String username;
+
+        if(auth == null){
+            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        else{
+            username = auth.username();
+        }
+
+        var message = username + " Has joined the game playing " + request.getColor() + "\n";
         System.out.print(message);
         var notification = new webSocketMessages.serverMessages.Notification(message);
-        connections.broadcast(username, notification);
+        connections.broadcast(auth.authToken(), notification);
 
-        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(join.gameID()));
-        connections.sendMessage(username, response);
+        var game = dataAccess.getGame(request.gameID());
+        if (game == null) {
+            var error = new ErrorNotification("ERROR: Game not found, check your game ID again.\n");
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        connections.sendMessage(auth.authToken(), response);
 
     }
 
