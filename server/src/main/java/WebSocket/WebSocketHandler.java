@@ -9,7 +9,9 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
+import webSocketMessages.serverMessages.ErrorNotification;
 import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinCommand;
 import webSocketMessages.userCommands.SpectateCommand;
@@ -43,7 +45,7 @@ public class WebSocketHandler {
 
         connections.add(username, session);
         var message = username + " has started stalking this game\n";
-        var notification = new webSocketMessages.serverMessages.Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notification = new webSocketMessages.serverMessages.Notification(message);
         connections.broadcast(username, notification);
 
         var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(input.gameID()));
@@ -51,13 +53,24 @@ public class WebSocketHandler {
     }
 
     private void join(JoinCommand join,Session session) throws IOException {
+        connections.add(join.getAuthString(), session);
+        AuthData auth = dataAccess.getUserByAuth(join.getAuthString());
+        String username;
 
-        String username = dataAccess.getUserByAuth(join.getAuthString()).username();
+        if(auth == null){
+            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(join.getAuthString(), error);
+            connections.remove(join.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        else{
+            username = auth.username();
+        }
 
-        connections.add(username, session);
         var message = username + " Has joined the game playing " + join.getColor() + "\n";
         System.out.print(message);
-        var notification = new webSocketMessages.serverMessages.Notification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var notification = new webSocketMessages.serverMessages.Notification(message);
         connections.broadcast(username, notification);
 
         var response = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, dataAccess.getGame(join.gameID()));

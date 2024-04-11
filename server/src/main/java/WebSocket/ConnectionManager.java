@@ -11,20 +11,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
-        connections.put(visitorName, connection);
+    public void add(String authToken, Session session) {
+        var connection = new Connection(authToken, session);
+        connections.put(authToken, connection);
     }
-
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(String authToken) {
+        connections.remove(authToken);
     }
     public void sendMessage(String username, ServerMessage message) throws IOException {
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (c.visitorName.equals(username)) {
-                    c.send(message.toString());
-                }
+        var c = connections.get(username);
+        if (c.session.isOpen()) {
+            if (c.visitorName.equals(username)) {
+                c.send(message.toString());
             }
         }
     }
