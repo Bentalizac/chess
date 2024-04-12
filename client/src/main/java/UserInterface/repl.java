@@ -1,4 +1,6 @@
 package UserInterface;
+import Facades.ServerFacade;
+import Facades.WebSocketFacade;
 import chess.BoardPainter;
 import chess.ChessBoard;
 import chess.ChessGame;
@@ -8,9 +10,7 @@ import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
 import model.UserData;
-import server.NotificationHandler;
-import server.ServerFacade;
-import server.WebSocketFacade;
+import Facades.NotificationHandler;
 import ui.EscapeSequences;
 
 import java.util.*;

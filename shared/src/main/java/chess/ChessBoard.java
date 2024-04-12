@@ -1,6 +1,5 @@
 package chess;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,8 +53,7 @@ public class ChessBoard {
 
     }
 
-    public ChessPiece[][] getSpaces() {
-        return spaces;
+    public void getSpaces() {
     }
 
 

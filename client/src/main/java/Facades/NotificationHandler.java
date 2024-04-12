@@ -1,4 +1,4 @@
-package server;
+package Facades;
 
 
 import chess.BoardPainter;

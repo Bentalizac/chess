@@ -1,13 +1,13 @@
 package UserInterface;
 
+import Facades.WebSocketFacade;
 import chess.BoardPainter;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ResponseException;
 import model.AuthData;
-import server.NotificationHandler;
-import server.WebSocketFacade;
+import Facades.NotificationHandler;
 import ui.EscapeSequences;
 
 import java.util.Objects;
@@ -26,7 +26,7 @@ public class PlayMenu {
     WebSocketFacade webSocketFacade;
     AuthData authData;
 
-    //WebSocketFacade socketFacade;
+    //Facades.WebSocketFacade socketFacade;
 
     public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth) {this.gameID = gameID;
     this.game = getGame(gameID);

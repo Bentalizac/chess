@@ -1,6 +1,4 @@
 import chess.*;
-import server.ServerFacade;
-import ui.EscapeSequences;
 
 import UserInterface.*;
 

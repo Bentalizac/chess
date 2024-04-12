@@ -1,9 +1,9 @@
 package clientTests;
 
+import Facades.ServerFacade;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
-import server.ServerFacade;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
