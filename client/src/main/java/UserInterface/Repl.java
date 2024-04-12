@@ -233,7 +233,7 @@ public class Repl {
                 try {
                     webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
                     webSocketFacade.spectate(authData, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData);
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, webSocketFacade.game);
                     game.run();
                 }
                 catch(ResponseException ex) {
@@ -255,7 +255,7 @@ public class Repl {
                 try {
                     webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
                     webSocketFacade.join(authData, color, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData);
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, webSocketFacade.game);
                     game.run();
                 }
                 catch(ResponseException ex) {

@@ -29,7 +29,6 @@ public class NotificationHandler {
         BoardPainter painter = new BoardPainter(game.getBoard());
         if(color == ChessGame.TeamColor.BLACK){
             System.out.print(painter.drawBlackDown());
-
         }
         else{
             painter.drawWhiteDown();

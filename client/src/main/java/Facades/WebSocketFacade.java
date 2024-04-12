@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint{
     Session session;
     NotificationHandler notificationHandler;
+    public ChessGame game;
     public WebSocketFacade(int port, NotificationHandler nh) throws ResponseException {
         try {
             String url = "ws://localhost:" + port;
@@ -28,15 +29,21 @@ public class WebSocketFacade extends Endpoint{
             this.session = container.connectToServer(this, socketURI);
 
             //set message handler
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                Notification notification = new Gson().fromJson(message, Notification.class);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    Notification notification = new Gson().fromJson(message, Notification.class);
 
-                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                    LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
-                    notificationHandler.loadGame(gameNotification);
-                }
-                else {
-                    notificationHandler.notify(notification);
+                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
+                        game = new Gson().fromJson( gameNotification.getGame(), ChessGame.class);
+                        notificationHandler.loadGame(gameNotification);
+                    }
+                    else {
+                        notificationHandler.notify(notification);
+                    }
+
+
                 }
             });
         }
@@ -51,7 +58,7 @@ public class WebSocketFacade extends Endpoint{
 
     public void spectate(AuthData data, int gameID) throws ResponseException {
         try {
-            onOpen(session, null); // Stops the grader from complaining
+            onOpen(session, null);
             var action = new SpectateCommand(data.authToken(), gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {

@@ -314,8 +314,9 @@ public class MySQLDataAccess implements DataAccess {
             return response.getFirst().gameID();
         }
         else{
-            return 1;
+            return 0;
         }
+
     }
 
     @Override

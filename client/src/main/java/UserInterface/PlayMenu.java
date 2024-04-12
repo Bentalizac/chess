@@ -28,8 +28,8 @@ public class PlayMenu {
 
     //Facades.WebSocketFacade socketFacade;
 
-    public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth) {this.gameID = gameID;
-    this.game = getGame();
+    public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth, ChessGame game) {this.gameID = gameID;
+    this.game = game;
     this.webSocketFacade = webSocketFacade;
     authData = auth;
     }
@@ -52,7 +52,6 @@ public class PlayMenu {
                 break;
             }
             System.out.print(SET_BG_COLOR_DARK_GREY+ response + "\n");
-
         }
         //playScanner.close();
     }
@@ -137,7 +136,6 @@ public class PlayMenu {
         ChessMove move = new ChessMove(startTile, endTile);
 
         try {
-            webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
             webSocketFacade.move(authData, move, gameID);
         }
         catch(ResponseException ex) {
@@ -147,12 +145,8 @@ public class PlayMenu {
         return "";
     }
 
-    private ChessGame getGame() {
-        return new ChessGame();
-    }
-
     public void redraw(){
-        ChessGame game = new ChessGame();
+        ChessGame game = webSocketFacade.game;
         BoardPainter painter = new BoardPainter(game.getBoard());
         if (game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
             painter.drawBlackDown();
@@ -168,7 +162,6 @@ public class PlayMenu {
         }
         String start = body[1];
         ChessPosition startTile;
-
         if (start.length() != 2){
             return;
         }
@@ -179,8 +172,7 @@ public class PlayMenu {
            System.out.print(ex.getMessage());
             return;
         }
-
-        BoardPainter painter = new BoardPainter(game.getBoard());
+        BoardPainter painter = new BoardPainter(webSocketFacade.game.getBoard());
         painter.highlight(startTile, game);
     }
 

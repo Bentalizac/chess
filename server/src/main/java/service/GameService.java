@@ -36,7 +36,7 @@ public class GameService {
     }
 
     private GameData buildNewGame(String gameName) { // Builds blank GameData records
-        int gameID = dataAccess.getNextID();
+        int gameID = dataAccess.getNextID() +1;
         ChessGame game = new ChessGame();
         ChessBoard board = new ChessBoard();
         board.resetBoard();
