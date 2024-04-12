@@ -30,7 +30,7 @@ public class ServerFacade {
             this.makeRequest("DELETE", path, null, UserData.class, null, null);
         }
         catch(ResponseException ex){
-            ex.getMessage();
+            System.out.print(ex.getMessage());
         }
     }
 
@@ -67,8 +67,8 @@ public class ServerFacade {
     public GameData[] listGames(AuthData data) {
         var path = "/game";
         try{
-            record ListGames(GameData[] games) {}
-            ListGames response = this.makeRequest("GET", path, null, ListGames.class, "authorization", data.authToken());
+            record listGames(GameData[] games) {}
+            listGames response = this.makeRequest("GET", path, null, listGames.class, "authorization", data.authToken());
             return response.games;
         }
         catch(ResponseException ex){
@@ -140,7 +140,6 @@ public class ServerFacade {
         T response = null;
         if (http.getContentLength() < 0) {
             try (InputStream respBody = http.getInputStream()) {
-                InputStreamReader reader = new InputStreamReader(respBody);
                 String output = readString(respBody);
                 if (responseClass != null) {
                     response = new Gson().fromJson(output, responseClass); // Add the function

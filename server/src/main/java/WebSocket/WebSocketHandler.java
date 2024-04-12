@@ -50,9 +50,7 @@ public class WebSocketHandler {
         connections.add(request.getAuthString(), session, request.getGameID());
 
         if (auth == null) {
-            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -67,9 +65,7 @@ public class WebSocketHandler {
 
         var game = dataAccess.getGame(request.getGameID());
         if (game == null) {
-            var error = new ErrorNotification("ERROR: Game not found, check your game ID again.\n");
-            connections.sendMessage(request.getAuthString(), error);
-            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Game not found, check your game ID again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -84,9 +80,7 @@ public class WebSocketHandler {
         String username;
 
         if(auth == null){
-            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -108,9 +102,7 @@ public class WebSocketHandler {
         String username;
 
         if(auth == null){
-            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -123,16 +115,12 @@ public class WebSocketHandler {
 
 
         if(!Objects.equals(username, data.whiteUsername()) && !Objects.equals(username, data.blackUsername())) {
-            var error = new ErrorNotification("ERROR: You can't surrender on behalf of others.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(),  new ErrorNotification("ERROR: You can't surrender on behalf of others.\n"));
             return;
         }
 
         if (data.victor() != null) {
-            var error = new ErrorNotification("ERROR: This game is already over.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: This game is already over.\n"));
             return;
         }
 
@@ -147,13 +135,11 @@ public class WebSocketHandler {
             dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), data.game(), victor));
         }
         catch (ResponseException ex) {
-            var error = new ErrorNotification("ERROR: The system didn't accept your cowardice. No retreat. No surrender.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: The system didn't accept your cowardice. No retreat. No surrender.\n"));
             return;
         }
         var message = username + " Has resigned. May dishonor be upon them, upon their family, and upon their cattle.\n";
-        System.out.print(message);
         var notification = new webSocketMessages.serverMessages.Notification(message);
         connections.broadcast(auth.authToken(), notification, request.getGameID());
         connections.sendMessage(auth.authToken(), notification);
@@ -169,9 +155,7 @@ public class WebSocketHandler {
         String username;
 
         if(auth == null){
-            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -186,22 +170,20 @@ public class WebSocketHandler {
 
         var game = dataAccess.getGame(request.getGameID());
         if (game == null) { // gameID not found
-            var error = new ErrorNotification("ERROR: Game not found, check your game ID again.\n");
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Game not found, check your game ID again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
         // color already taken by someone else
         if ((game.whiteUsername()!=null && !game.whiteUsername().equals(username) && request.getColor() == ChessGame.TeamColor.WHITE) || (game.blackUsername() != null && !game.blackUsername().equals(username) && request.getColor() == ChessGame.TeamColor.BLACK) ){
-            var error = new ErrorNotification("ERROR: That seat is already taken, find another.\n");
-            connections.sendMessage(request.getAuthString(), error);
+
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: That seat is already taken, find another.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
         // game not initialized TODO ask TAs about this one.
         if (Objects.equals(game.whiteUsername(), null) && Objects.equals(game.blackUsername(),null)) {
-            var error = new ErrorNotification("ERROR: That game hasn't started yet. Wait, how'd you even get in here?.\n");
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: That game hasn't started yet. Wait, how'd you even get in here?.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -214,9 +196,7 @@ public class WebSocketHandler {
         AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
         String username;
         if(auth == null){
-            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -226,9 +206,11 @@ public class WebSocketHandler {
 
         ChessMove move = request.getMove();
         GameData data = dataAccess.getGame(request.getGameID());
+
         ChessGame game = data.game();
         ChessGame.TeamColor sendingColor;
         String activePlayer;
+
         if(game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
             activePlayer = data.whiteUsername();
             sendingColor = ChessGame.TeamColor.WHITE;
@@ -239,16 +221,12 @@ public class WebSocketHandler {
         }
 
         if(data.victor() != null) {
-            var error = new ErrorNotification("ERROR: " + data.victor() + "already won this game.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: " + data.victor() + "already won this game.\n"));
             return;
         }
 
         if (!Objects.equals(username, activePlayer)) {
-            var error = new ErrorNotification("ERROR: You can't move someone else's piece.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: You can't move someone else's piece.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -257,9 +235,7 @@ public class WebSocketHandler {
             game.makeMove(move);
         }
         catch(InvalidMoveException ex) {
-            var error = new ErrorNotification("ERROR: That move is invalid, please try again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: That move is invalid, please try again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
@@ -267,9 +243,7 @@ public class WebSocketHandler {
             dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game, null));
         }
         catch(ResponseException ex){
-            var error = new ErrorNotification("ERROR: That move didn't go through, try again.\n");
-            System.out.print(error.getMessage());
-            connections.sendMessage(request.getAuthString(), error);
+            connections.sendMessage(request.getAuthString(),  new ErrorNotification("ERROR: That move didn't go through, try again.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }

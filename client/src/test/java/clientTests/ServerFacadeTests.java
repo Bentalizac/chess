@@ -123,8 +123,7 @@ public class ServerFacadeTests {
         serverFacade.register(validUser);
         AuthData auth = (AuthData) serverFacade.login(validUser);
         serverFacade.createGame(validGame, auth);
-        var response = serverFacade.joingame(new JoinGameRequest(null, 1), auth);
-        //assertEquals("JoinGameRequest[playerColor=null, gameID=0]", response);
+        serverFacade.joingame(new JoinGameRequest(null, 1), auth);
         assertTrue(true);
     }
     @Test
@@ -142,8 +141,8 @@ public class ServerFacadeTests {
         serverFacade.clear();
         serverFacade.register(validUser);
         AuthData auth = (AuthData) serverFacade.login(validUser);
-        var response = serverFacade.createGame(validGame, auth);
-        //assertEquals("{gameID=1}", response.toString());
+        serverFacade.createGame(validGame, auth);
+
         assertTrue(true);
     }
 

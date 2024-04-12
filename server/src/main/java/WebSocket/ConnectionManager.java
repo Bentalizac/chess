@@ -5,7 +5,6 @@ import webSocketMessages.serverMessages.ServerMessage;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
@@ -16,7 +15,6 @@ public class ConnectionManager {
         var connection = new Connection(authToken, session);
         connections.put(authToken, connection);
         gameConnections.put(authToken, gameID);
-
     }
     public void remove(String authToken) {
         connections.remove(authToken);
@@ -32,22 +30,12 @@ public class ConnectionManager {
     }
 
     public void broadcast(String excludeVisitorName, ServerMessage notification, int gameID) throws IOException {
-        var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.visitorName.equals(excludeVisitorName) && gameConnections.get(c.visitorName) == gameID) {
                     c.send(notification.toString());
                 }
-            } else {
-                //removeList.add(c);
             }
         }
-        /* Disabled connection cleanuo just in case
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.visitorName);
-        }
-        */
-
     }
 }
