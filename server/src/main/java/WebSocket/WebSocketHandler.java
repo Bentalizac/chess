@@ -181,7 +181,7 @@ public class WebSocketHandler {
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
             return;
         }
-        // game not initialized TODO ask TAs about this one.
+        // game not initialized  ask TAs about this one.
         if (Objects.equals(game.whiteUsername(), null) && Objects.equals(game.blackUsername(),null)) {
             connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: That game hasn't started yet. Wait, how'd you even get in here?.\n"));
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
