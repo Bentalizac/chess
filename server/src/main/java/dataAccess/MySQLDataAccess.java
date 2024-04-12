@@ -141,19 +141,19 @@ public class MySQLDataAccess implements DataAccess {
         return result;
     }
 
-    private ArrayList<GameData> getGameRecord(String statement, Object... params) {
+    private ArrayList<GameData> getGameRecord(String statement, Object... parameterList) {
         ArrayList<GameData> result = new ArrayList<>();
         try(var conn = DatabaseManager.getConnection()){
-            try(var ps = conn.prepareStatement(statement)) {
+            try(var prepareStatement = conn.prepareStatement(statement)) {
 
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                for (int i = 0; i < parameterList.length; i++) {
+                    var changed = parameterList[i];
+                    if (changed instanceof String p) prepareStatement.setString(i + 1, p);
+                    else if (changed instanceof Integer p) prepareStatement.setInt(i + 1, p);
                 }
-                try (var rs = ps.executeQuery()) {
-                    while(rs.next()) {
-                        result.add(resultToGame(rs));
+                try (var resultSet = prepareStatement.executeQuery()) {
+                    while(resultSet.next()) {
+                        result.add(resultToGame(resultSet));
                     }
                 }
             }
