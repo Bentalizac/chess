@@ -1,18 +1,12 @@
 package chess;
 
-import chess.*;
-
 import java.util.ArrayList;
 
 import static chess.EscapeSequences.*;
 
 public class BoardPainter {
-    private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_CHARS = 3;
-    private static final int LINE_WIDTH_IN_CHARS = 1;
-    private static final String EMPTY = "   ";
 
-    private ChessBoard board;
+    private final ChessBoard board;
     public BoardPainter(ChessBoard inBoard) {
         board = inBoard;
     }
@@ -45,65 +39,61 @@ public class BoardPainter {
 
 
     public String drawBlackDown() {
-        String output = "\n";
+        StringBuilder output = new StringBuilder("\n");
         for (int y = 1; y <9; y++){
-            output += " " + y + " ";
+            output.append(" ").append(y).append(" ");
             for (int x = 8; x >= 1; x--){
                 if(y%2 == 0) { // Even rows
                     if(x%2 == 0){
-
-                        output += buildBlackSquare(x, y);
+                        output.append(buildBlackSquare(x, y));
                     }
                     else{
-                        output += buildWhiteSquare(x, y);
+                        output.append(buildWhiteSquare(x, y));
                     }
                 }
                 else{
                     if(x%2 == 1){
-                        output += buildBlackSquare(x, y);
+                        output.append(buildBlackSquare(x, y));
                     }
                     else{
-                        output += buildWhiteSquare(x, y);
-                    }
-                }
-            }
-            output += "\n" + SET_BG_COLOR_DARK_GREY;
+                        output.append(buildWhiteSquare(x, y));
+                    }}}
+            output.append("\n" + SET_BG_COLOR_DARK_GREY);
         }
-        output += "    h  g  f  e  d  c  b  a \n";
+        output.append("    h  g  f  e  d  c  b  a \n");
         System.out.print(output);
-        return output;
+        return output.toString();
     }
 
-    public String drawWhiteDown() { // Returns the drawn and colored output for the white on bottom alignment
-        String output = "\n";
+    public void drawWhiteDown() { // Returns the drawn and colored output for the white on bottom alignment
+        StringBuilder output = new StringBuilder("\n");
         for (int y = 8; y >= 1; y--){
-            output += " " + (y) + " ";
+            output.append(" ").append(y).append(" ");
             for (int x = 1; x < 9; x++){
                 if(y%2 == 0) { // Even rows
                     if(x%2 == 0){
-                        output += buildBlackSquare(x, y);
+                        output.append(buildBlackSquare(x, y));
                     }
                     else{
-                        output += buildWhiteSquare(x, y);
+                        output.append(buildWhiteSquare(x, y));
                     }
                 }
                 else{
                     if(x%2 == 1){
-                        output += buildBlackSquare(x, y);
+                        output.append(buildBlackSquare(x, y));
                     }
                     else{
-                        output += buildWhiteSquare(x, y);
+                        output.append(buildWhiteSquare(x, y));
                     }
                 }
             }
-            output += "\n" + SET_BG_COLOR_DARK_GREY;
+            output.append("\n" + SET_BG_COLOR_DARK_GREY);
         }
-        output += "    a  b  c  d  e  f  g  h \n";
+        output.append("    a  b  c  d  e  f  g  h \n");
         System.out.print(output);
-        return output;
     }
 
-    public String highlight(ChessPosition position, ChessGame game) {
+    public void highlight(ChessPosition position, ChessGame game) {
         var validMoves = board.getPieceMoves(position);
 
         var endpositions = new ArrayList<ChessPosition>();
@@ -114,102 +104,98 @@ public class BoardPainter {
             endpositions.add(move.getEndPosition());
         }
 
+        StringBuilder output = new StringBuilder("\n");
         if (color == ChessGame.TeamColor.WHITE){
-            String output = "\n";
             for (int y = 8; y >= 1; y--){
-                output += " " + (y) + " ";
+                output.append(" ").append(y).append(" ");
                 for (int x = 1; x < 9; x++){
                     if(y%2 == 0) { // Even rows
                         if(x%2 == 0){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildBlackSquare(x, y);
+                                output.append(buildBlackSquare(x, y));
                             }
                         }
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildWhiteSquare(x, y);
+                                output.append(buildWhiteSquare(x, y));
                             }
                         }
                     }
                     else{
                         if(x%2 == 1){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildBlackSquare(x, y);
+                                output.append(buildBlackSquare(x, y));
                             }
                         }
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildWhiteSquare(x, y);
+                                output.append(buildWhiteSquare(x, y));
                             }
                         }
                     }
                 }
-                output += "\n" + SET_BG_COLOR_DARK_GREY;
+                output.append("\n" + SET_BG_COLOR_DARK_GREY);
             }
-            output += "    a  b  c  d  e  f  g  h \n";
-            System.out.print(output);
-            return output;
+            output.append("    a  b  c  d  e  f  g  h \n");
         }
         else{
-            String output = "\n";
             for (int y = 1; y <9; y++){
-                output += " " + y + " ";
+                output.append(" ").append(y).append(" ");
                 for (int x = 8; x >= 1; x--){
                     if(y%2 == 0) { // Even rows
                         if(x%2 == 0){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildBlackSquare(x, y);
+                                output.append(buildBlackSquare(x, y));
                             }
                         }
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildWhiteSquare(x, y);
+                                output.append(buildWhiteSquare(x, y));
                             }
                         }
                     }
                     else{
                         if(x%2 == 1){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildBlackSquare(x, y);
+                                output.append(buildBlackSquare(x, y));
                             }
                         }
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output += buildHighlightSquare(x ,y);
+                                output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output += buildWhiteSquare(x, y);
+                                output.append(buildWhiteSquare(x, y));
                             }
                         }
                     }
                 }
-                output += "\n" + SET_BG_COLOR_DARK_GREY;
+                output.append("\n" + SET_BG_COLOR_DARK_GREY);
             }
-            output += "    h  g  f  e  d  c  b  a \n";
-            System.out.print(output);
-            return output;
+            output.append("    h  g  f  e  d  c  b  a \n");
         }
+        System.out.print(output);
 
 
     }
