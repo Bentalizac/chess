@@ -28,29 +28,24 @@ public class WebSocketFacade extends Endpoint{
             this.session = container.connectToServer(this, socketURI);
 
             //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
+            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
+                Notification notification = new Gson().fromJson(message, Notification.class);
 
-                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                        LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
-                        notificationHandler.loadGame(gameNotification);
-                    }
-                    else {
-                        notificationHandler.notify(notification);
-                    }
+                if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                    LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
+                    notificationHandler.loadGame(gameNotification);
+                }
+                else {
+                    notificationHandler.notify(notification);
                 }
             });
         }
         catch(DeploymentException | IOException | URISyntaxException ex) {
-                ex.printStackTrace();
                 throw new ResponseException(500, ex.getMessage());
         }
 
     }
 
-    @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
