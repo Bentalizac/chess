@@ -58,6 +58,7 @@ public class WebSocketHandler {
         }
         else{
             username = auth.username();
+            System.out.print("Boo");
         }
 
         var message = username + " has started stalking this game\n";
