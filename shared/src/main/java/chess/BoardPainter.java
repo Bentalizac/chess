@@ -95,15 +95,10 @@ public class BoardPainter {
 
     public void highlight(ChessPosition position, ChessGame game) {
         var validMoves = board.getPieceMoves(position);
-
         var endpositions = new ArrayList<ChessPosition>();
-
         var color = game.getTeamTurn();
-
         for(ChessMove move : validMoves) {
-            endpositions.add(move.getEndPosition());
-        }
-
+            endpositions.add(move.getEndPosition());}
         StringBuilder output = new StringBuilder("\n");
         if (color == ChessGame.TeamColor.WHITE){
             for (int y = 8; y >= 1; y--){
@@ -112,40 +107,26 @@ public class BoardPainter {
                     if(y%2 == 0) { // Even rows
                         if(x%2 == 0){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output.append(buildHighlightSquare(x, y));
-                            }
+                                output.append(buildHighlightSquare(x, y));}
                             else {
-                                output.append(buildBlackSquare(x, y));
-                            }
-                        }
+                                output.append(buildBlackSquare(x, y));}}
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output.append(buildHighlightSquare(x, y));
-                            }
+                                output.append(buildHighlightSquare(x, y));}
                             else {
-                                output.append(buildWhiteSquare(x, y));
-                            }
-                        }
-                    }
+                                output.append(buildWhiteSquare(x, y));}}}
                     else{
                         if(x%2 == 1){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output.append(buildHighlightSquare(x, y));
-                            }
+                                output.append(buildHighlightSquare(x, y));}
                             else {
-                                output.append(buildBlackSquare(x, y));
-                            }
-                        }
+                                output.append(buildBlackSquare(x, y));}}
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
                                 output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output.append(buildWhiteSquare(x, y));
-                            }
-                        }
-                    }
-                }
+                                output.append(buildWhiteSquare(x, y));}}}}
                 output.append("\n" + SET_BG_COLOR_DARK_GREY);
             }
             output.append("    a  b  c  d  e  f  g  h \n");
@@ -168,36 +149,23 @@ public class BoardPainter {
                                 output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output.append(buildWhiteSquare(x, y));
-                            }
-                        }
-                    }
+                                output.append(buildWhiteSquare(x, y));}}}
                     else{
                         if(x%2 == 1){
                             if(endpositions.contains(new ChessPosition(x, y))) {
-                                output.append(buildHighlightSquare(x, y));
-                            }
+                                output.append(buildHighlightSquare(x, y));}
                             else {
-                                output.append(buildBlackSquare(x, y));
-                            }
-                        }
+                                output.append(buildBlackSquare(x, y));}}
                         else{
                             if(endpositions.contains(new ChessPosition(x, y))) {
                                 output.append(buildHighlightSquare(x, y));
                             }
                             else {
-                                output.append(buildWhiteSquare(x, y));
-                            }
-                        }
-                    }
-                }
+                                output.append(buildWhiteSquare(x, y));}}}}
                 output.append("\n" + SET_BG_COLOR_DARK_GREY);
             }
-            output.append("    h  g  f  e  d  c  b  a \n");
-        }
+            output.append("    h  g  f  e  d  c  b  a \n");}
         System.out.print(output);
-
-
     }
 
 }
