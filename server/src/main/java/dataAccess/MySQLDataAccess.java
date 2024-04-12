@@ -94,14 +94,14 @@ public class MySQLDataAccess implements DataAccess {
     private ArrayList<UserData> getUserRecord(String statement, Object... params) {
         ArrayList<UserData> result = new ArrayList<>();
         try(var conn = DatabaseManager.getConnection()){
-            try(var ps = conn.prepareStatement(statement)) {
+            try(var preparedStatement = conn.prepareStatement(statement)) {
 
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                for (int counter = 0; counter < params.length; counter++) {
+                    var parameter = params[counter];
+                    if (parameter instanceof String p) preparedStatement.setString(counter + 1, p);
+                    else if (parameter instanceof Integer p) preparedStatement.setInt(counter + 1, p);
                 }
-                try (var rs = ps.executeQuery()) {
+                try (var rs = preparedStatement.executeQuery()) {
                     while(rs.next()) {
                         result.add(resultToUser(rs));
                     }
