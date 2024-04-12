@@ -29,7 +29,7 @@ public class PlayMenu {
     //Facades.WebSocketFacade socketFacade;
 
     public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth) {this.gameID = gameID;
-    this.game = getGame(gameID);
+    this.game = getGame();
     this.webSocketFacade = webSocketFacade;
     authData = auth;
     }
@@ -74,9 +74,7 @@ public class PlayMenu {
                 redraw();
                 return "";
             }
-            case "highlight" -> {
-                highlight(body);
-            }
+            case "highlight" -> highlight(body);
         }
         return "Just ask for help if you don't know what else to say";
     }
@@ -94,8 +92,8 @@ public class PlayMenu {
     }
     private ChessPosition stringToCoord(String input) throws InvalidCoordinatesError{
         String[] pieces = input.split("");
-        int row = 0;
-        int col = 0;
+        int row;
+        int col;
         try {
             col = parseInt(pieces[1]);
         }
@@ -103,15 +101,15 @@ public class PlayMenu {
             throw new InvalidCoordinatesError("Coordinates need to be formatted as a letter followed by a number, like a1, or C8");
         }
         switch (pieces[0].toLowerCase()) {
-            case "a" -> {row = 1;}
-            case "b" -> {row = 2;}
-            case "c" -> {row = 3;}
-            case "d" -> {row = 4;}
-            case "e" -> {row = 5;}
-            case "f" -> {row = 6;}
-            case "g" -> {row = 7;}
-            case "h" -> {row = 8;}
-            default -> {throw new InvalidCoordinatesError(pieces[0] + " is an invalid column label");}
+            case "a" -> row = 1;
+            case "b" -> row = 2;
+            case "c" -> row = 3;
+            case "d" -> row = 4;
+            case "e" -> row = 5;
+            case "f" -> row = 6;
+            case "g" -> row = 7;
+            case "h" -> row = 8;
+            default -> throw new InvalidCoordinatesError(pieces[0] + " is an invalid column label");
         }
         if(col >= 9 || col <1) {
             throw new InvalidCoordinatesError(pieces[1] + " is an invalid row position");
@@ -149,8 +147,7 @@ public class PlayMenu {
         return "";
     }
 
-    private ChessGame getGame(int gameID) {
-        // TODO use websocket to fetch chessgame from server
+    private ChessGame getGame() {
         return new ChessGame();
     }
 
@@ -165,26 +162,26 @@ public class PlayMenu {
         }
     }
 
-    public String highlight(String [] body) {
+    public void highlight(String [] body) {
         if (body.length < 2) {
-            return "You're missing one or more fields, you need a starting coordinate, and an ending coordinate";
+            return;
         }
         String start = body[1];
         ChessPosition startTile;
 
         if (start.length() != 2){
-            return "Those coordinates are invalid, try again please.";
+            return;
         }
         try{
             startTile = stringToCoord(start);
         }
         catch(InvalidCoordinatesError ex) {
-            return ex.getMessage();
+           System.out.print(ex.getMessage());
+            return;
         }
 
         BoardPainter painter = new BoardPainter(game.getBoard());
         painter.highlight(startTile, game);
-        return "";
     }
 
 }

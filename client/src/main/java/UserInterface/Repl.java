@@ -292,18 +292,6 @@ public class Repl {
         var response = serverFacade.createGame(data, authData);
         return "";
     }
-    private String drawBoards() {
-
-        ChessGame game = new ChessGame();
-        ChessBoard board =game.getBoard();
-        board.resetBoard();
-        //board.addPiece(new ChessPosition(5, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        BoardPainter painter = new BoardPainter(board);
-        painter.drawWhiteDown();
-        painter.drawBlackDown();
-        return "";
-    }
-
     private boolean loginGate() {
         return this.authData == null;
     }
