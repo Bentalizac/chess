@@ -74,8 +74,28 @@ public class PlayMenu {
                 return "";
             }
             case "highlight" -> highlight(body);
+            case "leave" -> {
+                return leave();
+            }
+            case "resign" -> {
+
+            }
         }
         return "Just ask for help if you don't know what else to say";
+    }
+
+    private String leave() {
+        try{
+            webSocketFacade.leave(authData, gameID);
+        }
+        catch (ResponseException ex) {
+            return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
+        }
+        return "I guess you can leave early if ya like\n";
+    }
+
+    private String resign() {
+        return "TODO";
     }
 
     private String helpCommand() {

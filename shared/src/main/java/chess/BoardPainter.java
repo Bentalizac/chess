@@ -94,6 +94,7 @@ public class BoardPainter {
     public void highlight(ChessPosition position, ChessGame game) {
         var validMoves = board.getPieceMoves(position);
         var endpositions = new ArrayList<ChessPosition>();
+
         var color = game.getTeamTurn();
         for (ChessMove move : validMoves) {
             endpositions.add(move.getEndPosition());
