@@ -66,15 +66,6 @@ public class GameService {
         return this.getGames();
     }
 
-    public GameData getGame(int gameID){
-        try {
-            return dataAccess.getGame(gameID);
-        }
-        catch (ResponseException ex) {
-            return null;
-        }
-    }
-
     public void joinGame(JoinGameRequest info, String authToken) throws ResponseException{
         AuthData authorization = isAuthorized(authToken);
         if (authorization == null || authorization.authToken() == null) {

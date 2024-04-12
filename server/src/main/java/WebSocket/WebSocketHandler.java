@@ -118,7 +118,6 @@ public class WebSocketHandler {
         }
 
         GameData data = dataAccess.getGame(request.getGameID());
-        ChessGame game = data.game();
         String victor;
 
 
@@ -264,7 +263,7 @@ public class WebSocketHandler {
             return;
         }
         try {
-            dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game, data.victor()));
+            dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game, null));
         }
         catch(ResponseException ex){
             var error = new ErrorNotification("ERROR: That move didn't go through, try again.\n");

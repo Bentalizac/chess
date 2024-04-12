@@ -309,6 +309,7 @@ public class MySQLDataAccess implements DataAccess {
     public int getNextID() {
         String statement = "SELECT * FROM gameData WHERE id = (SELECT MAX(ID) FROM gameData)";
         var response = getGameRecord(statement);
+        assert response != null;
         if (!response.isEmpty()) {
             return response.getFirst().gameID();
         }
@@ -343,7 +344,7 @@ public class MySQLDataAccess implements DataAccess {
         }
     }
 
-    private boolean gameExists(GameData game) throws ResponseException {
+    private boolean gameExists(GameData game){
         //String statement = "SELECT * FROM gameData WHERE id =?";
         var response = getGame(game.gameID());
         return response != null;
