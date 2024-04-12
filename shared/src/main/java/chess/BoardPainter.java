@@ -34,56 +34,53 @@ public class BoardPainter {
         output += getPieceAtCoords(x, y) + " ";
         return output + SET_BG_COLOR_DARK_GREY;
     }
+
+    private String buildSquare(int x, int y){
+        StringBuilder output = new StringBuilder();
+        if(y%2 == 0) { // Even rows
+            if(x%2 == 0){
+                output.append(buildBlackSquare(x, y));
+            }
+            else{
+                output.append(buildWhiteSquare(x, y));
+            }}
+
+        else{
+            if(x%2 == 1){
+                output.append(buildBlackSquare(x, y));
+            }
+            else{
+                output.append(buildWhiteSquare(x, y));
+            }}
+        return output.toString();
+    }
+
+
     public String drawBlackDown() {
         StringBuilder output = new StringBuilder("\n");
-        for (int y = 1; y <9; y++){
+        for (int y = 1; y < 9; y++) {
             output.append(" ").append(y).append(" ");
-            for (int x = 8; x >= 1; x--){
-
-                if(y%2 == 0) { // Even rows
-                    if(x%2 == 0){
-                        output.append(buildBlackSquare(x, y));
-                    }
-                    else{
-                        output.append(buildWhiteSquare(x, y));
-                    }}
-
-                else{
-                    if(x%2 == 1){
-                        output.append(buildBlackSquare(x, y));
-                    }
-                    else{
-                        output.append(buildWhiteSquare(x, y));
-                    }}}
-            output.append("\n" + SET_BG_COLOR_DARK_GREY);
+            for (int x = 8; x >= 1; x--) {
+                output.append(buildSquare(x, y));
+                output.append("\n" + SET_BG_COLOR_DARK_GREY);
+            }
         }
         output.append("    h  g  f  e  d  c  b  a \n");
         System.out.print(output);
         return output.toString();
     }
 
+
+
     public void drawWhiteDown() { // Returns the drawn and colored output for the white on bottom alignment
         StringBuilder output = new StringBuilder("\n");
         for (int y = 8; y >= 1; y--){
             output.append(" ").append(y).append(" ");
+
             for (int x = 1; x < 9; x++){
-                if(y%2 == 0) { // Even rows
-                    if(x%2 == 0){
-                        output.append(buildBlackSquare(x, y));
-                    }
-                    else{
-                        output.append(buildWhiteSquare(x, y));
-                    }
-                }
-                else{
-                    if(x%2 == 1){
-                        output.append(buildBlackSquare(x, y));
-                    }
-                    else{
-                        output.append(buildWhiteSquare(x, y));
-                    }
-                }
+                output.append(buildSquare(x, y));
             }
+
             output.append("\n" + SET_BG_COLOR_DARK_GREY);
         }
         output.append("    a  b  c  d  e  f  g  h \n");
