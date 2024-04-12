@@ -141,13 +141,12 @@ public class PlayMenu {
         try {
             webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
             webSocketFacade.move(authData, move, gameID);
-
         }
         catch(ResponseException ex) {
             return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
         }
 
-        return "This is filler to run this thing";
+        return "";
     }
 
     private ChessGame getGame(int gameID) {

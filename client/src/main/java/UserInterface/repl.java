@@ -288,7 +288,7 @@ public class repl {
             return "All you need to make a game is a name, you can give me that much at least. \nBe better.";
         }
 
-        GameData data = new GameData(0, null, null, body[1], null, );
+        GameData data = new GameData(0, null, null, body[1], null, null);
         var response = serverFacade.createGame(data, authData);
         return "";
     }
