@@ -2,7 +2,6 @@ package service;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPosition;
 import dataAccess.DataAccess;
 import dataAccess.MemoryDataAccess;
 import dataAccess.MySQLDataAccess;
@@ -42,7 +41,7 @@ public class GameService {
         ChessBoard board = new ChessBoard();
         board.resetBoard();
         game.setBoard(board);
-        return new GameData(gameID, null, null, gameName, game);
+        return new GameData(gameID, null, null, gameName, game, null);
     }
 
     public int createGame(String gameName, String authToken) throws ResponseException {
@@ -92,13 +91,13 @@ public class GameService {
                 if (existingGame.blackUsername() != null && !existingGame.blackUsername().equals(authorization.username())){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
-                newGameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authorization.username(), existingGame.gameName(), existingGame.game());
+                newGameData = new GameData(existingGame.gameID(), existingGame.whiteUsername(), authorization.username(), existingGame.gameName(), existingGame.game(), existingGame.victor());
             }
             else if(info.playerColor().equals("WHITE")) {
                 if (existingGame.whiteUsername() != null  && !existingGame.whiteUsername().equals(authorization.username())){
                     throw new ResponseException(403, "error: USER ALREADY TAKEN");
                 }
-                newGameData = new GameData(existingGame.gameID(),  authorization.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game());
+                newGameData = new GameData(existingGame.gameID(),  authorization.username(), existingGame.blackUsername(), existingGame.gameName(), existingGame.game(), existingGame.victor());
             }
             else{
                 throw new ResponseException(403, "error: BAD COLOR");

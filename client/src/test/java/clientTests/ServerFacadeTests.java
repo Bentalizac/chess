@@ -26,7 +26,7 @@ public class ServerFacadeTests {
         serverFacade = new ServerFacade(port);
         serverFacade.clear();
         validUser = new UserData("a", "a", "a");
-        validGame = new GameData(1, null, null, "testGame", null);
+        validGame = new GameData(1, null, null, "testGame", null, );
 
     }
 

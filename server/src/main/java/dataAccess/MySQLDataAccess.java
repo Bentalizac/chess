@@ -230,7 +230,7 @@ public class MySQLDataAccess implements DataAccess {
             var json = response.getString("gameData");
             var result =  new Gson().fromJson(json, GameData.class);
             int id = response.getInt("id");
-            return new GameData(id, result.whiteUsername(), result.blackUsername(), result.gameName(), result.game());
+            return new GameData(id, result.whiteUsername(), result.blackUsername(), result.gameName(), result.game(), result.victor());
         }
         catch(SQLException ex) {
             return null;

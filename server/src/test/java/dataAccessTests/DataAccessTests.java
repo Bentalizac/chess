@@ -98,21 +98,21 @@ public class DataAccessTests {
     @Test
     void createGame() {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, null, null, "testing", new ChessGame());
+        var testGame = new GameData(100, null, null, "testing", new ChessGame(), null);
         assertDoesNotThrow(()-> dataAccess.createGame(testGame));
     }
 
     @Test
     void createGameNoName() {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, null, null, null, new ChessGame());
+        var testGame = new GameData(100, null, null, null, new ChessGame(), null);
         assertThrows(ResponseException.class,()-> dataAccess.createGame(testGame));
     }
 
     @Test
     void watchGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, null, null, "testing", new ChessGame());
+        var testGame = new GameData(100, null, null, "testing", new ChessGame(), null);
         dataAccess.createGame(testGame);
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
     }
@@ -120,13 +120,13 @@ public class DataAccessTests {
     @Test
     void watchGameBadId()  {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(1023434240, null, null, "testing", new ChessGame());
+        var testGame = new GameData(1023434240, null, null, "testing", new ChessGame(), null);
         assertThrows(ResponseException.class, ()-> dataAccess.updateGame(testGame));
     }
     @Test
     void joinGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame(), null);
         dataAccess.createGame(testGame);
         assertDoesNotThrow(()-> dataAccess.updateGame(testGame));
     }
@@ -134,14 +134,14 @@ public class DataAccessTests {
     @Test
     void joinGameBadId()  {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(1023655440, "JuanitaPablo", null, "testing", new ChessGame());
+        var testGame = new GameData(1023655440, "JuanitaPablo", null, "testing", new ChessGame(), null);
         assertThrows(ResponseException.class, ()-> dataAccess.updateGame(testGame));
     }
 
     @Test
     void getGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame(), null);
         dataAccess.createGame(testGame);
         assertEquals(dataAccess.getGame(testGame.gameID()).game(), testGame.game());
     }
@@ -156,7 +156,7 @@ public class DataAccessTests {
     @Test
     void getBadGame() throws ResponseException {
         DataAccess dataAccess = getDataAccess();
-        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame());
+        var testGame = new GameData(100, "JuanitaPablo", null, "testing", new ChessGame(), null);
         dataAccess.createGame(testGame);
         assertNull(dataAccess.getGame(23445));
     }

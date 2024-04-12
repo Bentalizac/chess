@@ -8,12 +8,9 @@ import dataAccess.MySQLDataAccess;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.GameService;
-import service.UserService;
 import webSocketMessages.serverMessages.ErrorNotification;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.Notification;
@@ -42,6 +39,7 @@ public class WebSocketHandler {
             case JOIN_PLAYER ->  join(new JoinCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
             case MAKE_MOVE ->  makeMove(new MakeMoveCommand( action.getAuthString(), action.getMove(), action.getGameID()), session);
             case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
+            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID()), session);
         }
     }
 
@@ -103,6 +101,68 @@ public class WebSocketHandler {
         connections.remove(username);
     }
 
+    public void resign(ResignCommand request, Session session) throws IOException{
+        connections.add(request.getAuthString(), session, request.getGameID());
+        AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
+        String username;
+
+        if(auth == null){
+            var error = new ErrorNotification("ERROR: Action unauthorized. Please try logging out and back in again.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+            return;
+        }
+        else{
+            username = auth.username();
+        }
+
+        GameData data = dataAccess.getGame(request.getGameID());
+        ChessGame game = data.game();
+        String victor;
+
+
+        if(!Objects.equals(username, data.whiteUsername()) && !Objects.equals(username, data.blackUsername())) {
+            var error = new ErrorNotification("ERROR: You can't surrender on behalf of others.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            return;
+        }
+
+        if (data.victor() != null) {
+            var error = new ErrorNotification("ERROR: This game is already over.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            return;
+        }
+
+        if(Objects.equals(username, data.whiteUsername())) {
+            victor = data.blackUsername();
+        }
+        else{
+            victor = data.whiteUsername();
+        }
+
+        try {
+            dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), data.game(), victor));
+        }
+        catch (ResponseException ex) {
+            var error = new ErrorNotification("ERROR: The system didn't accept your cowardice. No retreat. No surrender.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            return;
+        }
+        var message = username + " Has resigned. May dishonor be upon them, upon their family, and upon their cattle.\n";
+        System.out.print(message);
+        var notification = new webSocketMessages.serverMessages.Notification(message);
+        connections.broadcast(auth.authToken(), notification, request.getGameID());
+        connections.sendMessage(auth.authToken(), notification);
+
+
+
+
+    }
+
     private void join(JoinCommand request,Session session) throws IOException {
         connections.add(request.getAuthString(), session, request.gameID());
         AuthData auth = dataAccess.getUserByAuth(request.getAuthString());
@@ -139,7 +199,7 @@ public class WebSocketHandler {
             return;
         }
         // game not initialized TODO ask TAs about this one.
-        if (!Objects.equals(game.whiteUsername(), username) && !Objects.equals(game.blackUsername(), username)) {
+        if (Objects.equals(game.whiteUsername(), null) && Objects.equals(game.blackUsername(),null)) {
             var error = new ErrorNotification("ERROR: That game hasn't started yet. Wait, how'd you even get in here?.\n");
             connections.sendMessage(request.getAuthString(), error);
             connections.remove(request.getAuthString()); // Disconnect erroneous connection
@@ -178,6 +238,13 @@ public class WebSocketHandler {
             sendingColor = ChessGame.TeamColor.BLACK;
         }
 
+        if(data.victor() != null) {
+            var error = new ErrorNotification("ERROR: " + data.victor() + "already won this game.\n");
+            System.out.print(error.getMessage());
+            connections.sendMessage(request.getAuthString(), error);
+            return;
+        }
+
         if (!Objects.equals(username, activePlayer)) {
             var error = new ErrorNotification("ERROR: You can't move someone else's piece.\n");
             System.out.print(error.getMessage());
@@ -197,7 +264,7 @@ public class WebSocketHandler {
             return;
         }
         try {
-            dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game));
+            dataAccess.updateGame(new GameData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName(), game, data.victor()));
         }
         catch(ResponseException ex){
             var error = new ErrorNotification("ERROR: That move didn't go through, try again.\n");
