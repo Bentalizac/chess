@@ -208,27 +208,40 @@ public class WebSocketHandler {
         GameData data = dataAccess.getGame(request.getGameID());
 
         ChessGame game = data.game();
-        ChessGame.TeamColor sendingColor;
         String activePlayer;
-
-        if(game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
-            activePlayer = data.whiteUsername();
-            sendingColor = ChessGame.TeamColor.WHITE;
-        }
-        else{
-            activePlayer = data.blackUsername();
-            sendingColor = ChessGame.TeamColor.BLACK;
-        }
-
+        String nonActivePlayer;
+        ChessGame.TeamColor sendingColor;
         if(data.victor() != null) {
             connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: " + data.victor() + "already won this game.\n"));
             return;
         }
 
-        if (!Objects.equals(username, activePlayer)) {
-            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: You can't move someone else's piece.\n"));
-            connections.remove(request.getAuthString()); // Disconnect erroneous connection
+        if(game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+            activePlayer = data.whiteUsername();
+            nonActivePlayer = data.blackUsername();
+        }
+        else{
+            activePlayer = data.blackUsername();
+            nonActivePlayer = data.whiteUsername();
+        }
+
+        if (!Objects.equals(username, activePlayer) && !Objects.equals(username, nonActivePlayer)) {
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: The peanut gallery doesn't get to play, go make your own game.\n"));
+            connections.remove(request.getAuthString());
             return;
+        }
+
+        if (!Objects.equals(username, activePlayer)) {
+            connections.sendMessage(request.getAuthString(), new ErrorNotification("ERROR: Wait your turn.\n"));
+            connections.remove(request.getAuthString());
+            return;
+        }
+
+        if(Objects.equals(username, data.whiteUsername())) {
+            sendingColor = ChessGame.TeamColor.WHITE;
+        }
+        else{
+            sendingColor = ChessGame.TeamColor.BLACK;
         }
 
         try {

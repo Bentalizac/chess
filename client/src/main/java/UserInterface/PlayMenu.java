@@ -26,10 +26,13 @@ public class PlayMenu {
     WebSocketFacade webSocketFacade;
     AuthData authData;
 
+    Repl source;
+
     //Facades.WebSocketFacade socketFacade;
 
-    public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth, ChessGame game) {this.gameID = gameID;
-    this.game = game;
+    public PlayMenu(int gameID, WebSocketFacade webSocketFacade, AuthData auth, Repl source) {this.gameID = gameID;
+    this.game = source.game;
+    this.source = source;
     this.webSocketFacade = webSocketFacade;
     authData = auth;
     }
@@ -91,7 +94,7 @@ public class PlayMenu {
         catch (ResponseException ex) {
             return "Musta been a connection issue, this things says \n" + ex.getMessage() + "\n";
         }
-        return "I guess you can leave early if ya like\n";
+        return "quit";
     }
 
     private String resign() {
@@ -133,7 +136,7 @@ public class PlayMenu {
         if(col >= 9 || col <1) {
             throw new InvalidCoordinatesError(pieces[1] + " is an invalid row position");
         }
-        return new ChessPosition(row, col);
+        return new ChessPosition(col, row);
     }
     private String makeMove(String[] body) {
         if (body.length < 3) {
@@ -166,7 +169,7 @@ public class PlayMenu {
     }
 
     public void redraw(){
-        ChessGame game = webSocketFacade.game;
+        ChessGame game = this.source.game;
         BoardPainter painter = new BoardPainter(game.getBoard());
         if (game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
             painter.drawBlackDown();
@@ -192,8 +195,8 @@ public class PlayMenu {
            System.out.print(ex.getMessage());
             return;
         }
-        BoardPainter painter = new BoardPainter(webSocketFacade.game.getBoard());
-        painter.highlight(startTile, game);
+        BoardPainter painter = new BoardPainter(this.source.game.getBoard());
+        painter.highlight(startTile, this.source.game);
     }
 
 }

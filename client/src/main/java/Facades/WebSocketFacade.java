@@ -33,18 +33,7 @@ public class WebSocketFacade extends Endpoint{
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-
-                    if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-                        LoadGameMessage gameNotification = new Gson().fromJson(message, LoadGameMessage.class);
-                        game = new Gson().fromJson( gameNotification.getGame(), ChessGame.class);
-                        notificationHandler.loadGame(gameNotification);
-                    }
-                    else {
-                        notificationHandler.notify(notification);
-                    }
-
-
+                    notificationHandler.notify(message);
                 }
             });
         }

@@ -66,8 +66,8 @@ public class BoardPainter {
             output.append(" ").append(y).append(" ");
             for (int x = 8; x >= 1; x--) {
                 output.append(buildSquare(x, y, false));
-                output.append("\n" + SET_BG_COLOR_DARK_GREY);
             }
+            output.append("\n" + SET_BG_COLOR_DARK_GREY);
         }
         output.append("    h  g  f  e  d  c  b  a \n");
         System.out.print(output);
@@ -102,10 +102,13 @@ public class BoardPainter {
         StringBuilder output = new StringBuilder("\n");
         for (int y = 8; y >= 1; y--) {
             output.append(" ").append(y).append(" ");
+
             for (int x = (color == ChessGame.TeamColor.WHITE) ? 1 : 8;
                  (color == ChessGame.TeamColor.WHITE) ? x < 9 : x >= 1;
+
                  x += (color == ChessGame.TeamColor.WHITE) ? 1 : -1) {
-                ChessPosition currentPos = new ChessPosition(x, y);
+
+                ChessPosition currentPos = new ChessPosition(y, x);
                 output.append(buildSquare(x, y, endpositions.contains(currentPos)));
             }
             output.append("\n" + SET_BG_COLOR_DARK_GREY);

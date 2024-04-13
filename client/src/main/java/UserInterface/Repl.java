@@ -1,24 +1,30 @@
 package UserInterface;
+import Facades.NotificationHandler;
 import Facades.ServerFacade;
 import Facades.WebSocketFacade;
 import chess.BoardPainter;
 import chess.ChessBoard;
 import chess.ChessGame;
 
+import com.google.gson.Gson;
+import com.sun.nio.sctp.HandlerResult;
+
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.JoinGameRequest;
 import model.UserData;
-import Facades.NotificationHandler;
 import ui.EscapeSequences;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.util.*;
 
 import static chess.EscapeSequences.*;
 
 
-public class Repl {
+public class Repl implements NotificationHandler {
 
     AuthData authData = null;
     final static String DECOROW = (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) +(SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + (SET_BG_COLOR_WHITE + EMPTY) + (SET_BG_COLOR_BLACK + EMPTY) + SET_BG_COLOR_DARK_GREY;
@@ -26,6 +32,8 @@ public class Repl {
 
     ServerFacade serverFacade = new ServerFacade(8080);
     WebSocketFacade webSocketFacade;
+
+    ChessGame game;
 
     public void runREPL(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -231,9 +239,9 @@ public class Repl {
             if(gameExists(response)) {
 
                 try {
-                    webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
+                    webSocketFacade = new WebSocketFacade(8080, this);
                     webSocketFacade.spectate(authData, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, webSocketFacade.game);
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, this);
                     game.run();
                 }
                 catch(ResponseException ex) {
@@ -253,9 +261,9 @@ public class Repl {
                     color = ChessGame.TeamColor.BLACK;
                 }
                 try {
-                    webSocketFacade = new WebSocketFacade(8080, new NotificationHandler());
+                    webSocketFacade = new WebSocketFacade(8080, this);
                     webSocketFacade.join(authData, color, Integer.parseInt(body[1]));
-                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, webSocketFacade.game);
+                    PlayMenu game = new PlayMenu(Integer.parseInt(body[1]), webSocketFacade, authData, this);
                     game.run();
                 }
                 catch(ResponseException ex) {
@@ -296,5 +304,32 @@ public class Repl {
         return this.authData == null;
     }
 
+    public void loadGame(LoadGameMessage input) {
+        System.out.println(input.getMessage());
+        drawBoard(input, input.getColor());
+    }
+
+    private void drawBoard(Notification input, ChessGame.TeamColor color){
+        ChessGame game = new Gson().fromJson(input.getGame(), ChessGame.class);
+        BoardPainter painter = new BoardPainter(game.getBoard());
+        if(color == ChessGame.TeamColor.BLACK){
+            System.out.print(painter.drawBlackDown());
+        }
+        else{
+            painter.drawWhiteDown();
+        }
+    }
+
+    public void notify(String message){
+        Notification notification = new Gson().fromJson(message, Notification.class);
+        if (notification.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
+            LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
+            this.game = new Gson().fromJson(loadGame.getGame(), ChessGame.class);
+            loadGame(loadGame);
+        }
+        else{
+            System.out.print(notification.getMessage());
+        }
+    }
 
 }
